@@ -60,7 +60,6 @@ namespace Stamper.UI.ViewModels
         public ICommand LoadToken { get; set; }
         public ICommand ResetImageCommand { get; set; }
         public ICommand UpdateResolution { get; set; }
-        public ICommand ShowInstructions { get; set; }
         public RelayCommand OpenPreviewWindow { get; set; }
         public RelayCommand UpdatePreview { get; set; }
         public RelayCommand UpdateZoomSpeed { get; set; }

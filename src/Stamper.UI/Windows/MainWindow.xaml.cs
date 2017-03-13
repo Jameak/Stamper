@@ -61,13 +61,6 @@ namespace Stamper.UI.Windows
             _vm.UpdatePreview = new RelayCommand(o => RenderImage(), o => _preWindow != null);
             _vm.SaveToken = new RelayCommand(o => MenuItemSave_OnClick(null, null));
             _vm.LoadToken = new RelayCommand(o => MenuItemLoad_OnClick(null, null));
-            _vm.ShowInstructions = new RelayCommand(o =>
-            {
-                _vm.Image = BitmapHelper.ConvertBitmapToImageSource(DataAccess.Properties.Resources.Splash);
-                ZoomControl.Reset();
-                SpecialControl._vm.RotationAngle = "0";
-                if (_vm.AutoUpdatePreview) RenderImage();
-            });
             _vm.UpdateZoomSpeed = new RelayCommand(o =>
             {
                 _vm.ZoomSpeed = o.ToString();
@@ -75,7 +68,7 @@ namespace Stamper.UI.Windows
                 ZoomControl.ZoomSpeed = Convert.ToDouble(param);
             });
 
-            _vm.ShowInstructions.Execute(null);
+            _vm.Image = BitmapHelper.ConvertBitmapToImageSource(DataAccess.Properties.Resources.Splash);
 
             //Timer for mousewheel events.
             _timer = new DispatcherTimer();
@@ -531,5 +524,16 @@ namespace Stamper.UI.Windows
             SpecialControl._vm.RotationAngle = _vm.RotationAngle.ToString();
         }
         #endregion
+
+        private void MenuItemLoadInstructions_OnClick(object sender, RoutedEventArgs e)
+        {
+            var window = new InstructionsWindow
+            {
+                Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            };
+
+            window.Show();
+        }
     }
 }

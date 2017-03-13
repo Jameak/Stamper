@@ -1,0 +1,32 @@
+﻿<Window x:Class="Stamper.UI.Windows.InstructionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Stamper.UI.Windows"
+        mc:Ignorable="d"
+        Title="Stamper Instructions" Height="210" Width="300">
+    <Grid Margin="8">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Column="0" Grid.Row="0" Text="Controls:" FontWeight="SemiBold" Margin="0,0,0,3"/>
+        <TextBlock Grid.Column="0" Grid.Row="1" Text="Scrollwheel to zoom."/>
+        <TextBlock Grid.Column="0" Grid.Row="2" Text="Ctrl + scrollwheel to rotate."/>
+        <TextBlock Grid.Column="0" Grid.Row="3" Text="Right-click and drag to pan."/>
+        <TextBlock Grid.Column="0" Grid.Row="4" Text="To load an image either drag-and-drop it onto the token to load or use the filepicker." TextWrapping="Wrap"/>
+        <TextBlock Grid.Column="0" Grid.Row="5" Text="Rotation can also be controlled from the 'Special' tab." Margin="0,10,0,0" TextWrapping="Wrap"/>
+    </Grid>
+</Window>

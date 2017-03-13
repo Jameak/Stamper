@@ -108,6 +108,9 @@
     <Compile Include="Windows\CustomSizeWindow.xaml.cs">
       <DependentUpon>CustomSizeWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\InstructionsWindow.xaml.cs">
+      <DependentUpon>InstructionsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -174,6 +177,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\CustomSizeWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\InstructionsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
