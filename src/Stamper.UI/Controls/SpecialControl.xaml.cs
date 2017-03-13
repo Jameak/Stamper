@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ColorPickerWPF;
+using Stamper.UI.Events;
 using Stamper.UI.ViewModels;
 using Stamper.UI.ViewModels.Base;
 
@@ -48,6 +49,14 @@ namespace Stamper.UI.Controls
                     args.PropertyName == nameof(_vm.TextRotationAngle) || args.PropertyName == nameof(_vm.TextContent))
                     RaiseEvent(new RoutedEventArgs(TextManipulationChangedEvent));
             };
+            _vm.ManualZoomImage = new RelayCommand(o =>
+            {
+                RaiseEvent(new ButtonZoomEvent(ButtonZoomEvent, int.Parse(o.ToString()), "Image"));
+            });
+            _vm.ManualZoomText = new RelayCommand(o =>
+            {
+                RaiseEvent(new ButtonZoomEvent(ButtonZoomEvent, int.Parse(o.ToString()), "Text"));
+            });
         }
 
         private void FilterBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -130,6 +139,17 @@ namespace Stamper.UI.Controls
         {
             add { AddHandler(TextManipulationChangedEvent, value); }
             remove { RemoveHandler(TextManipulationChangedEvent, value); }
+        }
+
+
+        public static readonly RoutedEvent ButtonZoomEvent =
+            EventManager.RegisterRoutedEvent(nameof(ButtonZoomEvent), RoutingStrategy.Bubble,
+                                             typeof(RoutedEventHandler), typeof(SpecialControl));
+
+        public event RoutedEventHandler ButtonZoom
+        {
+            add { AddHandler(ButtonZoomEvent, value); }
+            remove { RemoveHandler(ButtonZoomEvent, value); }
         }
         #endregion
     }

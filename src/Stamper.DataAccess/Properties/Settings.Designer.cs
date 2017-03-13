@@ -37,7 +37,7 @@ namespace Stamper.DataAccess.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("v1.0.0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("v1.0.1")]
         public string Version {
             get {
                 return ((string)(this["Version"]));

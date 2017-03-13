@@ -31,6 +31,8 @@ namespace Stamper.UI.ViewModels
 
         public ICommand FireRotationProperty { get; private set; }
         public ICommand ColorPickCommand { get; set; }
+        public ICommand ManualZoomImage { get; set; }
+        public ICommand ManualZoomText { get; set; }
 
         public SpecialControlViewModel()
         {

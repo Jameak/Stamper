@@ -29,6 +29,11 @@ namespace Stamper.UI.Controls
             }
         }
 
+        public void ManualZoom(ButtonZoomEvent e)
+        {
+            ZoomDeltaTo(e.Direction < 0 ? -120 : 120, new Point(ActualWidth/2, ActualHeight/2));
+        }
+
 
         public static readonly RoutedEvent RotationEvent =
             EventManager.RegisterRoutedEvent(nameof(RotationEvent), RoutingStrategy.Bubble,

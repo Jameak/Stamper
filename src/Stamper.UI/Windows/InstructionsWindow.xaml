@@ -27,6 +27,6 @@
         <TextBlock Grid.Column="0" Grid.Row="2" Text="Ctrl + scrollwheel to rotate."/>
         <TextBlock Grid.Column="0" Grid.Row="3" Text="Right-click and drag to pan."/>
         <TextBlock Grid.Column="0" Grid.Row="4" Text="To load an image either drag-and-drop it onto the token to load or use the filepicker." TextWrapping="Wrap"/>
-        <TextBlock Grid.Column="0" Grid.Row="5" Text="Rotation can also be controlled from the 'Special' tab." Margin="0,10,0,0" TextWrapping="Wrap"/>
+        <TextBlock Grid.Column="0" Grid.Row="5" Text="Rotation and zoom can also be controlled from the 'Special' tab." Margin="0,10,0,0" TextWrapping="Wrap"/>
     </Grid>
 </Window>

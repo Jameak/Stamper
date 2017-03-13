@@ -535,5 +535,23 @@ namespace Stamper.UI.Windows
 
             window.Show();
         }
+
+        private void SpecialControl_OnButtonZoom(object sender, RoutedEventArgs e)
+        {
+            var e1 = (ButtonZoomEvent) e;
+            switch (e1.Target)
+            {
+                case "Image":
+                    ZoomControl.ManualZoom(e1);
+                    break;
+                case "Text":
+                    ZoomControl_Text.ManualZoom(e1);
+                    break;
+                default:
+                    throw new ArgumentException();
+            }
+
+            if (_vm.AutoUpdatePreview) RenderImage();
+        }
     }
 }
