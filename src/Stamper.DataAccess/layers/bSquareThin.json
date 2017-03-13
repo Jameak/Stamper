@@ -1,0 +1,6 @@
+{
+  "name": "Square, Thin",
+  "file": "svg\\bSquareThin.svg",
+  "mask": "svg\\bSquareThin_mask.svg",
+  "type": "border"
+}

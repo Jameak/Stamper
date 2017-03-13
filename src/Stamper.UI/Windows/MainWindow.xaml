@@ -1,0 +1,114 @@
+﻿<Window x:Class="Stamper.UI.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Stamper.UI"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:controls="clr-namespace:Stamper.UI.Controls"
+        xmlns:converters="clr-namespace:Stamper.UI.Converters"
+        mc:Ignorable="d"
+        Title="Stamper" Height="640" Width="1138">
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Control" Key="O" Command="{Binding LoadToken}"/>
+        <KeyBinding Modifiers="Control" Key="L" Command="{Binding LoadToken}"/>
+        <KeyBinding Modifiers="Control" Key="S" Command="{Binding SaveToken}"/>
+    </Window.InputBindings>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" DockPanel.ZIndex="9001">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Load image" Click="MenuItemLoad_OnClick"/>
+                <MenuItem Header="_Save token" Click="MenuItemSave_OnClick"/>
+                <MenuItem Header="_Upload to Imgur" Click="MenuItemImgur_OnClick" x:Name="MenuImgur"/>
+                <Separator/>
+                <MenuItem Header="_Add layer" Click="MenuItemAddLayer_OnClick"/>
+            </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Header="_Zoom Speed">
+                    <MenuItem Header="_Normal" IsChecked="{Binding ZoomSpeed, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_ZoomConverter}, ConverterParameter='1.2'}" Command="{Binding UpdateZoomSpeed}" CommandParameter="1.2"/>
+                    <MenuItem Header="_Slow" IsChecked="{Binding ZoomSpeed, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_ZoomConverter}, ConverterParameter='1.05'}" Command="{Binding UpdateZoomSpeed}" CommandParameter="1.05"/>
+                    <MenuItem Header="_Glacial" IsChecked="{Binding ZoomSpeed, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_ZoomConverter}, ConverterParameter='1.005'}" Command="{Binding UpdateZoomSpeed}" CommandParameter="1.005"/>
+                </MenuItem>
+                <MenuItem Header="_Reset image" Command="{Binding ResetImageCommand}"/>
+                <Separator/>
+                <MenuItem Header="_Open Preview Window" Command="{Binding OpenPreviewWindow}"/>
+                <MenuItem Header="_Update Preview" Command="{Binding UpdatePreview}"/>
+                <Separator/>
+                <MenuItem Header="_Auto-Update Preview Window" IsCheckable="True" IsChecked="{Binding AutoUpdatePreview}"/>
+            </MenuItem>
+            <MenuItem Header="_Size">
+                <MenuItem Header="_256 x 256" IsChecked="{Binding ImageResolution, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_SizeConverter}, ConverterParameter=256}" Command="{Binding UpdateResolution}" CommandParameter="256"/>
+                <MenuItem Header="_512 x 512" IsChecked="{Binding ImageResolution, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_SizeConverter}, ConverterParameter=512}" Command="{Binding UpdateResolution}" CommandParameter="512"/>
+                <MenuItem Header="_1024 x 1024" IsChecked="{Binding ImageResolution, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_SizeConverter}, ConverterParameter=1024}" Command="{Binding UpdateResolution}" CommandParameter="1024"/>
+                <MenuItem Header="_Custom Size" Click="MenuItemCustomSize_OnClick"/>
+                <Separator/>
+                <MenuItem Header="_Virtual Tabletop">
+                    <MenuItem Header="_Roll20 (70 x 70)" IsChecked="{Binding ImageResolution, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_SizeConverter}, ConverterParameter=70}" Command="{Binding UpdateResolution}" CommandParameter="70"/>
+                    <MenuItem Header="_Roll20, 2 by 2 (140 x 140)" IsChecked="{Binding ImageResolution, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_SizeConverter}, ConverterParameter=140}" Command="{Binding UpdateResolution}" CommandParameter="140"/>
+                    <MenuItem Header="_Fantasy Grounds (50 x 50)" IsChecked="{Binding ImageResolution, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_SizeConverter}, ConverterParameter=50}" Command="{Binding UpdateResolution}" CommandParameter="50"/>
+                    <MenuItem Header="_Fantasy Grounds (64 x 64)" IsChecked="{Binding ImageResolution, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_SizeConverter}, ConverterParameter=64}" Command="{Binding UpdateResolution}" CommandParameter="64"/>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_Load instruction image" Command="{Binding ShowInstructions}"/>
+                <MenuItem Header="_Ratelimit Info" Click="MenuItemRatelimiter_OnClick"/>
+                <MenuItem Header="_About" Click="MenuItemAbout_OnClick"/>
+            </MenuItem>
+        </Menu>
+        <Grid DockPanel.Dock="Bottom">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="250" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+                <controls:CustomZoomBorder  x:Name="ZoomControl" Grid.Column="0" Grid.Row="0" AllowDrop="True" Drop="ZoomControl_OnDrop" MouseRightButtonUp="ZoomControl_OnMouseRightButtonUp" MouseWheel="ZoomControl_OnMouseWheel" Rotation="ZoomControl_OnRotation">
+                    <Border>
+                        <Border RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <RotateTransform Angle="{Binding RotationAngle}"/>
+                            </Border.RenderTransform>
+                            <Image Source="{Binding Image}"/>
+                        </Border>
+                    </Border>
+
+                </controls:CustomZoomBorder>
+                <StackPanel Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+                    <Image x:Name="OverlayImage" Stretch="None"/>
+                </StackPanel>
+                <StackPanel Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+                    <Image x:Name="BorderImage" Stretch="None"/>
+                </StackPanel>
+                <controls:ZoomBorder_NotHitTestable Grid.Column="0" Grid.Row="0" x:Name="ZoomControl_Text" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding ShowText}" Rotation="ZoomControl_Text_OnRotation" MouseRightButtonUp="ZoomControl_OnMouseRightButtonUp" MouseWheel="ZoomControl_OnMouseWheel">
+                    <Border>
+                        <Border BorderThickness="1" BorderBrush="{Binding BorderBrush}" RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <RotateTransform Angle="{Binding TextRotationAngle}"/>
+                            </Border.RenderTransform>
+                            <TextBlock Text="{Binding TextContent}" FontSize="59" FontFamily="{Binding TextFont}" Foreground="{Binding TextColor}"/>
+                        </Border>
+                    </Border>
+                </controls:ZoomBorder_NotHitTestable>
+
+                <StackPanel Grid.Column="0" Grid.Row="0" x:Name="RenderLocation" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" Height="{Binding ImageResolution}" Width="{Binding ImageResolution}"/>
+
+
+                <!--Right-hand side controls-->
+                <Rectangle Grid.Column="1" Grid.Row="0" Fill="White"/>
+                <TabControl Grid.Column="1" Grid.Row="0">
+                    <TabItem Header="Borders">
+                        <controls:BorderControl x:Name="Borders" BorderSelected="BorderControl_OnBorderSelected" TintSelected="BorderControl_OnTintSelected" TintFilterSelected="BorderControl_OnTintFilterSelected"/>
+                    </TabItem>
+                    <TabItem Header="Overlays">
+                        <controls:OverlayControl x:Name="Overlays" OverlaySelected="OverlayControl_OnOverlaySelected" TintSelected="OverlayControl_OnTintSelected" TintFilterSelected="OverlayControl_OnTintFilterSelected"/>
+                    </TabItem>
+                    <TabItem Header="Special">
+                        <controls:SpecialControl x:Name="SpecialControl" FilterSelected="SpecialControl_OnFilterSelected" RotationChanged="SpecialControl_OnRotationChanged" TextManipulationChanged="SpecialControl_OnTextManipulationChanged"/>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+        </Grid>
+    </DockPanel>
+</Window>

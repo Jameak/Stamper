@@ -1,0 +1,7 @@
+<svg width="100%" height="100%" >
+    <linearGradient id="grad" gradientUnits="userSpaceOnUse" x1="0%" y1="0%" x2="0%" y2="120%">
+        <stop stop-color="#000000" stop-opacity="1" offset="1"/>
+        <stop stop-color="#000000" stop-opacity="0" offset="0"/>
+    </linearGradient>
+    <rect x="0" y="0" width="100%" height="100%" fill="url(#grad)" />
+</svg>

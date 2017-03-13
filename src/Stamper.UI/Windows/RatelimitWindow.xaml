@@ -1,0 +1,47 @@
+﻿<Window x:Class="Stamper.UI.Windows.RatelimitWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Ratelimit Info" Height="160" Width="360">
+    <Grid Margin="8">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Text="Uploading to Imgur is subject to ratelimiting." FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,8"/>
+        <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,0,2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="You can upload "/>
+            <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding IpLimit}" IsEnabled="False"/>
+            <TextBlock Grid.Column="2" Grid.Row="0" Text=" more images to Imgur within this hour."/>
+        </Grid>
+        <Grid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Margin="0,0,0,2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="Users of Stamper can upload "/>
+            <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding ClientWideLimit}" IsEnabled="False"/>
+            <TextBlock Grid.Column="2" Grid.Row="0" Text=" additional images today."/>
+        </Grid>
+        <StackPanel Grid.Column="1" Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="RefreshButton" Content="Refresh" Command="{Binding RefreshCommand}" Padding="5,0,5,0" Margin="0,5,5,0"/>
+        </StackPanel>
+    </Grid>
+</Window>

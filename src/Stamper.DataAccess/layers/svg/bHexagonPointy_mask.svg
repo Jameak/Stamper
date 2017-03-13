@@ -1,0 +1,4 @@
+<svg width="320" height="320">
+  <rect width="320" height="320" stroke="#00FF00" stroke-width="2" fill="#00FF00"/>
+  <polygon points="160,10 290,85 290,235 160,310 30,235 30,85" fill="#FFFFFF"/>
+</svg>

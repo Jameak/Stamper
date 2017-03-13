@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{14782136-A601-444B-B57A-92359342749D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stamper.UI", "src\Stamper.UI\Stamper.UI.csproj", "{03473581-E49D-4939-85E0-1A06618FE249}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stamper.DataAccess", "src\Stamper.DataAccess\Stamper.DataAccess.csproj", "{394F317F-C673-40E8-8F3A-EEBD2EBE049F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8F1039B1-4023-4A3A-A567-DA513673A8C4}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{03473581-E49D-4939-85E0-1A06618FE249}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03473581-E49D-4939-85E0-1A06618FE249}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03473581-E49D-4939-85E0-1A06618FE249}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03473581-E49D-4939-85E0-1A06618FE249}.Release|Any CPU.Build.0 = Release|Any CPU
+		{394F317F-C673-40E8-8F3A-EEBD2EBE049F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{394F317F-C673-40E8-8F3A-EEBD2EBE049F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{394F317F-C673-40E8-8F3A-EEBD2EBE049F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{394F317F-C673-40E8-8F3A-EEBD2EBE049F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{03473581-E49D-4939-85E0-1A06618FE249} = {14782136-A601-444B-B57A-92359342749D}
+		{394F317F-C673-40E8-8F3A-EEBD2EBE049F} = {14782136-A601-444B-B57A-92359342749D}
+	EndGlobalSection
+EndGlobal

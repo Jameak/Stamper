@@ -1,0 +1,6 @@
+{
+  "name": "Circle, Thin",
+  "file": "svg\\bCircleThin.svg",
+  "mask": "svg\\bCircleThin_mask.svg",
+  "type": "border"
+}

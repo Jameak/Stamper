@@ -1,0 +1,6 @@
+{
+  "name": "Hexagon, Flat",
+  "file": "svg\\bHexagonFlat.svg",
+  "mask": "svg\\bHexagonFlat_mask.svg",
+  "type": "border"
+}

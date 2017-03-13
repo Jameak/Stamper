@@ -1,0 +1,6 @@
+{
+  "name": "Hexagon, Pointy",
+  "file": "svg\\bHexagonPointy.svg",
+  "mask": "svg\\bHexagonPointy_mask.svg",
+  "type": "border"
+}

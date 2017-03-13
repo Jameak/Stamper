@@ -1,0 +1,6 @@
+{
+  "name": "Square",
+  "file": "svg\\bSquare.svg",
+  "mask": "svg\\bSquare_mask.svg",
+  "type": "border"
+}
