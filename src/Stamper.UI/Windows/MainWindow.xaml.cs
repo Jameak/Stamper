@@ -92,6 +92,14 @@ namespace Stamper.UI.Windows
             win.Show();
         }
 
+        /// <summary>
+        /// Renders the image when all window rendering has been completed.
+        /// </summary>
+        private void RenderUsingDispatcher()
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() => RenderImage()));
+        }
+
         private void OpenPreviewWindow(object sender, RoutedEventArgs e)
         {
             _preWindow?.Close();
@@ -311,6 +319,31 @@ namespace Stamper.UI.Windows
 
             if (_vm.AutoUpdatePreview) RenderImage();
         }
+
+        private void SpecialControl_OnButtonZoom(object sender, RoutedEventArgs e)
+        {
+            var e1 = (ButtonZoomEvent)e;
+            switch (e1.Target)
+            {
+                case "Image":
+                    ZoomControl.ManualZoom(e1);
+                    break;
+                case "Text":
+                    ZoomControl_Text.ManualZoom(e1);
+                    break;
+                default:
+                    throw new ArgumentException();
+            }
+
+            if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
+        }
+
+        private void SpecialControl_OnBackdropColorChanged(object sender, RoutedEventArgs e)
+        {
+            _vm.BackdropColor = new SolidColorBrush((sender as SpecialControl)._vm.BackdropColor);
+
+            if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
+        }
         #endregion
 
         #region Menu
@@ -452,6 +485,17 @@ namespace Stamper.UI.Windows
                 }
             };
         }
+
+        private void MenuItemLoadInstructions_OnClick(object sender, RoutedEventArgs e)
+        {
+            var window = new InstructionsWindow
+            {
+                Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            };
+
+            window.Show();
+        }
         #endregion
 
         #region ZoomBorder
@@ -524,34 +568,5 @@ namespace Stamper.UI.Windows
             SpecialControl._vm.RotationAngle = _vm.RotationAngle.ToString();
         }
         #endregion
-
-        private void MenuItemLoadInstructions_OnClick(object sender, RoutedEventArgs e)
-        {
-            var window = new InstructionsWindow
-            {
-                Owner = this,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner
-            };
-
-            window.Show();
-        }
-
-        private void SpecialControl_OnButtonZoom(object sender, RoutedEventArgs e)
-        {
-            var e1 = (ButtonZoomEvent) e;
-            switch (e1.Target)
-            {
-                case "Image":
-                    ZoomControl.ManualZoom(e1);
-                    break;
-                case "Text":
-                    ZoomControl_Text.ManualZoom(e1);
-                    break;
-                default:
-                    throw new ArgumentException();
-            }
-
-            if (_vm.AutoUpdatePreview) RenderImage();
-        }
     }
 }

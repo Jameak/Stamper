@@ -55,7 +55,9 @@ namespace Stamper.UI.ViewModels
         private SolidColorBrush _textColor = new SolidColorBrush(Colors.Black);
         public SolidColorBrush TextColor { get { return _textColor; } set { if (_textColor != value) { _textColor = value; OnPropertyChanged(); } } }
 
-
+        private SolidColorBrush _backdropColor = new SolidColorBrush(Colors.Transparent);
+        public SolidColorBrush BackdropColor { get { return _backdropColor; } set { if (_backdropColor != value) { _backdropColor = value; OnPropertyChanged(); } } }
+        
         public ICommand SaveToken { get; set; }
         public ICommand LoadToken { get; set; }
         public ICommand ResetImageCommand { get; set; }

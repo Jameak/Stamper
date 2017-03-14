@@ -41,6 +41,17 @@ namespace Stamper.UI.Controls
                 }
             });
 
+            _vm.BackdropColorPickCommand = new RelayCommand(o =>
+            {
+                Color color;
+                bool ok = ColorPickerWindow.ShowDialog(out color);
+                if (ok)
+                {
+                    _vm.BackdropColor = color;
+                    RaiseEvent(new RoutedEventArgs(BackdropColorChangedEvent));
+                }
+            });
+
             _vm.PropertyChanged += (sender, args) =>
             {
                 if (args.PropertyName == nameof(_vm.RotationAngle)) RaiseEvent(new RoutedEventArgs(RotationChangedEvent));
@@ -150,6 +161,17 @@ namespace Stamper.UI.Controls
         {
             add { AddHandler(ButtonZoomEvent, value); }
             remove { RemoveHandler(ButtonZoomEvent, value); }
+        }
+
+
+        public static readonly RoutedEvent BackdropColorChangedEvent =
+            EventManager.RegisterRoutedEvent(nameof(BackdropColorChangedEvent), RoutingStrategy.Bubble,
+                                             typeof(RoutedEventHandler), typeof(SpecialControl));
+
+        public event RoutedEventHandler BackdropColorChanged
+        {
+            add { AddHandler(BackdropColorChangedEvent, value); }
+            remove { RemoveHandler(BackdropColorChangedEvent, value); }
         }
         #endregion
     }

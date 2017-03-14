@@ -64,7 +64,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*" />
                 </Grid.RowDefinitions>
-                <controls:CustomZoomBorder  x:Name="ZoomControl" Grid.Column="0" Grid.Row="0" AllowDrop="True" Drop="ZoomControl_OnDrop" MouseRightButtonUp="ZoomControl_OnMouseRightButtonUp" MouseWheel="ZoomControl_OnMouseWheel" Rotation="ZoomControl_OnRotation">
+                <controls:CustomZoomBorder  x:Name="ZoomControl" Grid.Column="0" Grid.Row="0" AllowDrop="True" Drop="ZoomControl_OnDrop" MouseRightButtonUp="ZoomControl_OnMouseRightButtonUp" MouseWheel="ZoomControl_OnMouseWheel" Rotation="ZoomControl_OnRotation" Background="{Binding BackdropColor}">
                     <Border>
                         <Border RenderTransformOrigin="0.5,0.5">
                             <Border.RenderTransform>
@@ -105,7 +105,7 @@
                         <controls:OverlayControl x:Name="Overlays" OverlaySelected="OverlayControl_OnOverlaySelected" TintSelected="OverlayControl_OnTintSelected" TintFilterSelected="OverlayControl_OnTintFilterSelected"/>
                     </TabItem>
                     <TabItem Header="Special">
-                        <controls:SpecialControl x:Name="SpecialControl" FilterSelected="SpecialControl_OnFilterSelected" RotationChanged="SpecialControl_OnRotationChanged" TextManipulationChanged="SpecialControl_OnTextManipulationChanged" ButtonZoom="SpecialControl_OnButtonZoom"/>
+                        <controls:SpecialControl x:Name="SpecialControl" FilterSelected="SpecialControl_OnFilterSelected" RotationChanged="SpecialControl_OnRotationChanged" TextManipulationChanged="SpecialControl_OnTextManipulationChanged" ButtonZoom="SpecialControl_OnButtonZoom" BackdropColorChanged="SpecialControl_OnBackdropColorChanged"/>
                     </TabItem>
                 </TabControl>
             </Grid>
