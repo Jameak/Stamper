@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -20,6 +21,11 @@ namespace Stamper.UI
 {
     public static class BitmapHelper
     {
+        /// <summary>
+        /// The color in the mask-image that will be removed from images that masks are applied to.
+        /// </summary>
+        private static Color _maskColor = Color.FromArgb(255, 0, 255, 0);
+
         /// <summary>
         /// <see cref="LayerSource.ConvertBitmapToPixelFormat_32bppArgb(Bitmap)"/>
         /// </summary>
@@ -122,7 +128,8 @@ namespace Stamper.UI
                     var R = maskbuffer[offset + 2];
                     var A = maskbuffer[offset + 3];
 
-                    if (R == 0 && G == 255 && B == 0 && A == 255) //If the pixel is #00FF00, we should make the pixel in the output transparent.
+                    //If the color matches our mask-color, then make it transparent.
+                    if (R == _maskColor.R && G == _maskColor.G && B == _maskColor.B && A == _maskColor.A)
                     {
                         imagebuffer[offset + 0] = 0;
                         imagebuffer[offset + 1] = 0;
@@ -270,6 +277,18 @@ namespace Stamper.UI
             }
         }
 
+        public static async Task<Bitmap> LoadBitmapAsync(string path)
+        {
+            return ConvertToPixelFormat_32bppArgb(await Task.Factory.StartNew(() =>
+            {
+                var file = File.ReadAllBytes(path);
+                using (var ms = new MemoryStream(file))
+                {
+                    return new Bitmap(ms);
+                }
+            }));
+        }
+
         /// <summary>
         /// Download an image from the given url. Will abort if download takes more than 60 seconds.
         /// </summary>
@@ -290,13 +309,118 @@ namespace Stamper.UI
                 {
                     await stream.CopyToAsync(ms, 81920, tokensource.Token);
                     ms.Position = 1;
-                    return new Bitmap(ms);
+                    return ConvertToPixelFormat_32bppArgb(new Bitmap(ms));
                 }
             }
             catch (TaskCanceledException e)
             {
                 throw new WebException("Connection lost", e);
             }
-        } 
+        }
+
+        /// <summary>
+        /// Generates a mask from the given image.
+        /// This is a best-effort attempt that will probably be worse than a well-made custom mask.
+        /// 
+        /// This works by running a breadth-first search starting from the corners of the image,
+        /// setting all pixels in the mask to the specified mask-color, if the pixel is transparent in the image.
+        /// 
+        /// This ensures that enclosed transparent holes in the given image are preserved in the masked image.
+        /// E.g. When generating a mask for a circle, we want keep everything inside the circle, but remove
+        /// everything outside of it.
+        /// 
+        /// Additionally, this BFS implementation eats 1 additional pixel around all transparent colors to help
+        /// provide a mask with nice edges around the layered image.
+        /// </summary>
+        /// <param name="image">The image to generate a mask for.</param>
+        /// <returns>The generated mask</returns>
+        public static Bitmap GenerateMask(Bitmap image)
+        {
+            var mask = new Bitmap(image.Width, image.Height);
+            var queue = new ConcurrentQueue<Coordinate>();
+            var set = new ConcurrentDictionary<Coordinate, bool>(); //We only need a set, but C# doesn't have a concurrent implementation
+
+            var corners = new List<Coordinate>
+            {
+                new Coordinate(0, 0),                             // Top left
+                new Coordinate(0, image.Height - 1),              // Bottom left
+                new Coordinate(image.Width - 1, 0),               // Top right
+                new Coordinate(image.Width - 1, image.Height - 1) // Bottom right
+            };
+
+            //Enqueue our starting positions.
+            foreach (var corner in corners)
+            {
+                if (image.GetPixel(corner.X, corner.Y).A == Color.Transparent.A)
+                {
+                    mask.SetPixel(corner.X, corner.Y, _maskColor);
+                    queue.Enqueue(corner);
+                    set.TryAdd(corner, true);
+                }
+            }
+            
+            while (!queue.IsEmpty)
+            {
+                Coordinate coord;
+                if (!queue.TryDequeue(out coord)) continue; //Should never fail, for single-threaded BFS. Important if/when I turn it into a multi-threaded version.
+
+                foreach (var coordinate in coord.SurroundingCoords(image).Where(c => !set.ContainsKey(c)))
+                {
+                    set.TryAdd(coordinate, true);
+                    mask.SetPixel(coordinate.X, coordinate.Y, _maskColor);
+
+                    var imagepixel = image.GetPixel(coordinate.X, coordinate.Y);
+                    if (imagepixel.A == Color.Transparent.A)
+                    {
+                        queue.Enqueue(coordinate);
+                    }
+                }
+            }
+            
+            return mask;
+        }
+
+        private class Coordinate
+        {
+            public int X { get; }
+            public int Y { get; }
+
+            public Coordinate(int x, int y)
+            {
+                X = x;
+                Y = y;
+            }
+
+            public IEnumerable<Coordinate> SurroundingCoords(Bitmap image)
+            {
+                var list = new List<Coordinate>
+                {
+                    new Coordinate(X - 1, Y),
+                    new Coordinate(X, Y - 1),
+                    new Coordinate(X + 1, Y),
+                    new Coordinate(X, Y + 1)
+                };
+
+                return list.Where(coordinate => coordinate.IsValidLocation(image));
+            }
+
+            private bool IsValidLocation(Bitmap image)
+            {
+                return X >= 0 && Y >= 0 && X < image.Width && Y < image.Height;
+            }
+
+            public override bool Equals(object obj)
+            {
+                var coord = obj as Coordinate;
+                if (coord == null) return false;
+
+                return coord.X == X && coord.Y == Y;
+            }
+
+            public override int GetHashCode()
+            {
+                return X * 100 + Y;
+            }
+        }
     }
 }

@@ -94,7 +94,9 @@
     <Compile Include="ViewModels\Base\BaseViewModel.cs" />
     <Compile Include="ViewModels\Base\RelayCommand.cs" />
     <Compile Include="ViewModels\BorderControlViewModel.cs" />
+    <Compile Include="ViewModels\Enums\ExternalImageType.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\ManageLayersWindowViewModel.cs" />
     <Compile Include="ViewModels\OverlayControlViewModel.cs" />
     <Compile Include="ViewModels\PreviewWindowViewModel.cs" />
     <Compile Include="ViewModels\RatelimitWindowViewModel.cs" />
@@ -114,6 +116,9 @@
     </Compile>
     <Compile Include="Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\ManageLayersWindow.xaml.cs">
+      <DependentUpon>ManageLayersWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\PreviewWindow.xaml.cs">
       <DependentUpon>PreviewWindow.xaml</DependentUpon>
@@ -186,6 +191,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\ManageLayersWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

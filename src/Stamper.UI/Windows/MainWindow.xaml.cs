@@ -17,6 +17,7 @@ using Stamper.UI.Events;
 using Stamper.UI.Filters;
 using Stamper.UI.ViewModels;
 using Stamper.UI.ViewModels.Base;
+using Stamper.UI.ViewModels.Enums;
 using Color = System.Drawing.Color;
 using Point = System.Windows.Point;
 using Rectangle = System.Windows.Shapes.Rectangle;
@@ -166,16 +167,16 @@ namespace Stamper.UI.Windows
             // Modify the rendered image.
             if (_overlayInfo != null)
             {
-                var overlay = LayerSource.GetBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
+                var overlay = LayerSource.LoadBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
                 BitmapHelper.AddFilter(overlay, _overlayTintColor, _overlayTintFilter);
-                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlay, LayerSource.GetBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolution, _vm.ImageResolution));
+                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlay, LayerSource.LoadBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolution, _vm.ImageResolution));
                 BitmapHelper.AddLayerToImage(bitmap, overlay);
             }
 
             if (_borderInfo != null)
             {
-                if (!string.IsNullOrWhiteSpace(_borderInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(bitmap, LayerSource.GetBitmapFromFile(_borderInfo.Info.Mask, _vm.ImageResolution, _vm.ImageResolution));
-                var border = LayerSource.GetBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
+                if (!string.IsNullOrWhiteSpace(_borderInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(bitmap, LayerSource.LoadBitmapFromFile(_borderInfo.Info.Mask, _vm.ImageResolution, _vm.ImageResolution));
+                var border = LayerSource.LoadBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
                 BitmapHelper.AddFilter(border, _borderTintColor, _borderTintFilter);
                 BitmapHelper.AddLayerToImage(bitmap, border);  //Draw the border
             }
@@ -196,7 +197,7 @@ namespace Stamper.UI.Windows
             if (_borderInfo != null)
             {
                 //Border
-                var borderImage = LayerSource.GetBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
+                var borderImage = LayerSource.LoadBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
                 BitmapHelper.AddFilter(borderImage, _borderTintColor, _borderTintFilter);
 
                 BorderImage.Source = BitmapHelper.ConvertBitmapToImageSource(borderImage);
@@ -207,9 +208,9 @@ namespace Stamper.UI.Windows
             if (_overlayInfo != null)
             {
                 //Overlay
-                var overlayImage = LayerSource.GetBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
+                var overlayImage = LayerSource.LoadBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
                 BitmapHelper.AddFilter(overlayImage, _overlayTintColor, _overlayTintFilter);
-                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlayImage, LayerSource.GetBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolution, _vm.ImageResolution));
+                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlayImage, LayerSource.LoadBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolution, _vm.ImageResolution));
 
                 OverlayImage.Source = BitmapHelper.ConvertBitmapToImageSource(overlayImage);
                 OverlayImage.Height = _vm.ImageResolution;
@@ -455,37 +456,6 @@ namespace Stamper.UI.Windows
             };
         }
 
-        private void MenuItemAddLayer_OnClick(object sender, RoutedEventArgs e)
-        {
-            var win = new AddLayerWindow()
-            {
-                Owner = this,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner
-            };
-
-            win.Show();
-
-            win.Closing += (o, args) =>
-            {
-                if (win.OkClicked)
-                {
-                    var layerType = (Layer.LayerType)win.LayerType.SelectedItem;
-
-                    switch (layerType)
-                    {
-                        case Layer.LayerType.Border:
-                            Borders.RefreshLayers();
-                            break;
-                        case Layer.LayerType.Overlay:
-                            Overlays.RefreshLayers();
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                }
-            };
-        }
-
         private void MenuItemLoadInstructions_OnClick(object sender, RoutedEventArgs e)
         {
             var window = new InstructionsWindow
@@ -495,6 +465,23 @@ namespace Stamper.UI.Windows
             };
 
             window.Show();
+        }
+
+        private void MenuItemManageLayers_OnClick(object sender, RoutedEventArgs e)
+        {
+            var win = new ManageLayersWindow
+            {
+                Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            };
+
+            win.Show();
+
+            win.Closing += (o, args) =>
+            {
+                Borders.RefreshLayers();
+                Overlays.RefreshLayers();
+            };
         }
         #endregion
 

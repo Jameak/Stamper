@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Stamper.UI.ViewModels.Base;
+using Stamper.UI.ViewModels.Enums;
 using FontFamily = System.Windows.Media.FontFamily;
 
 namespace Stamper.UI.ViewModels
@@ -80,22 +81,12 @@ namespace Stamper.UI.ViewModels
                     case ExternalImageType.WebContent:
                     {
                         Bitmap img = await BitmapHelper.GetWebContent(uri);
-                        img = BitmapHelper.ConvertToPixelFormat_32bppArgb(img);
                         Image = BitmapHelper.ConvertBitmapToImageSource(img);
                     }
                         break;
                     case ExternalImageType.LocalFile:
                     {
-                        Bitmap img = await Task.Factory.StartNew(() =>
-                        {
-                            var file = File.ReadAllBytes(uri);
-                            using (var ms = new MemoryStream(file))
-                            {
-                                return new Bitmap(ms);
-                            }
-                        });
-                        img = BitmapHelper.ConvertToPixelFormat_32bppArgb(img);
-                        
+                        Bitmap img = await BitmapHelper.LoadBitmapAsync(uri);
                         Image = BitmapHelper.ConvertBitmapToImageSource(img);
                     }
                         break;
@@ -108,10 +99,5 @@ namespace Stamper.UI.ViewModels
                 Image = BitmapHelper.ConvertBitmapToImageSource(DataAccess.Properties.Resources.LoadFailure);
             }
         }
-    }
-
-    public enum ExternalImageType
-    {
-        LocalFile, WebContent
     }
 }

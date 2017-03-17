@@ -63,6 +63,16 @@ namespace Stamper.DataAccess.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap LayerPreviewImage {
+            get {
+                object obj = ResourceManager.GetObject("LayerPreviewImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap LoadFailure {
             get {
                 object obj = ResourceManager.GetObject("LoadFailure", resourceCulture);

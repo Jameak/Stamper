@@ -39,7 +39,7 @@ namespace Stamper.UI.ViewModels
             var emptyLayer = layers.FirstOrDefault(i => i.Type == Layer.LayerType.Overlay && i.Name == "None");
             if (emptyLayer != null) Overlays.Add(new OverlayInfo
             {
-                Image = BitmapHelper.ConvertBitmapToImageSource(LayerSource.GetBitmapFromFile(emptyLayer.File, previewResolution, 5)),
+                Image = BitmapHelper.ConvertBitmapToImageSource(LayerSource.LoadBitmapFromFile(emptyLayer.File, previewResolution, 5)),
                 Info = emptyLayer
             });
 
@@ -47,7 +47,7 @@ namespace Stamper.UI.ViewModels
             {
                 Overlays.Add(new OverlayInfo
                 {
-                    Image = BitmapHelper.ConvertBitmapToImageSource(LayerSource.GetBitmapFromFile(layer.File, previewResolution, previewResolution)),
+                    Image = BitmapHelper.ConvertBitmapToImageSource(LayerSource.LoadBitmapFromFile(layer.File, previewResolution, previewResolution)),
                     Info = layer
                 });
             }
