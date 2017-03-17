@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -80,21 +81,13 @@ namespace Stamper.UI
             var maskdepth = Image.GetPixelFormatSize(maskdata.PixelFormat) / 8;
             var maskbuffer = new byte[maskdata.Width * maskdata.Height * maskdepth];
             Marshal.Copy(maskdata.Scan0, maskbuffer, 0, maskbuffer.Length);
-            
+
             Parallel.Invoke(
-                () =>
-                {
-                    ParallelApplyMaskToImage(maskbuffer, imagebuffer, 0, 0, maskdata.Width / 4, maskdata.Height, maskdata.Width, maskdepth);
-                }, () =>
-                {
-                    ParallelApplyMaskToImage(maskbuffer, imagebuffer, maskdata.Width / 4, 0, maskdata.Width / 2, maskdata.Height, maskdata.Width, maskdepth);
-                }, () =>
-                {
-                    ParallelApplyMaskToImage(maskbuffer, imagebuffer, maskdata.Width / 2, 0, maskdata.Width / 4 * 3, maskdata.Height, maskdata.Width, maskdepth);
-                }, () =>
-                {
-                    ParallelApplyMaskToImage(maskbuffer, imagebuffer, maskdata.Width / 4 * 3, 0, maskdata.Width, maskdata.Height, maskdata.Width, maskdepth);
-                });
+                () => ParallelApplyMaskToImage(maskbuffer, imagebuffer, 0, 0, maskdata.Width / 4, maskdata.Height, maskdata.Width, maskdepth),
+                () => ParallelApplyMaskToImage(maskbuffer, imagebuffer, maskdata.Width / 4, 0, maskdata.Width / 2, maskdata.Height, maskdata.Width, maskdepth),
+                () => ParallelApplyMaskToImage(maskbuffer, imagebuffer, maskdata.Width / 2, 0, maskdata.Width / 4 * 3, maskdata.Height, maskdata.Width, maskdepth),
+                () => ParallelApplyMaskToImage(maskbuffer, imagebuffer, maskdata.Width / 4 * 3, 0, maskdata.Width, maskdata.Height, maskdata.Width, maskdepth)
+            );
             
 
             Marshal.Copy(imagebuffer, 0, imagedata.Scan0, imagebuffer.Length);
@@ -178,19 +171,11 @@ namespace Stamper.UI
             Marshal.Copy(imagedata.Scan0, imagebuffer, 0, imagebuffer.Length);
 
             Parallel.Invoke(
-                () =>
-                {
-                    ParallelAddFilter(imagebuffer, 0, 0, imagedata.Width / 4, imagedata.Height, imagedata.Width, imagedepth, tintFilter, tint);
-                }, () =>
-                {
-                    ParallelAddFilter(imagebuffer, imagedata.Width / 4, 0, imagedata.Width / 2, imagedata.Height, imagedata.Width, imagedepth, tintFilter, tint);
-                }, () =>
-                {
-                    ParallelAddFilter(imagebuffer, imagedata.Width / 2, 0, imagedata.Width / 4 * 3, imagedata.Height, imagedata.Width, imagedepth, tintFilter, tint);
-                }, () =>
-                {
-                    ParallelAddFilter(imagebuffer, imagedata.Width / 4 * 3, 0, imagedata.Width, imagedata.Height, imagedata.Width, imagedepth, tintFilter, tint);
-                });
+                () => ParallelAddFilter(imagebuffer, 0, 0, imagedata.Width / 4, imagedata.Height, imagedata.Width, imagedepth, tintFilter, tint),
+                () => ParallelAddFilter(imagebuffer, imagedata.Width / 4, 0, imagedata.Width / 2, imagedata.Height, imagedata.Width, imagedepth, tintFilter, tint),
+                () => ParallelAddFilter(imagebuffer, imagedata.Width / 2, 0, imagedata.Width / 4 * 3, imagedata.Height, imagedata.Width, imagedepth, tintFilter, tint),
+                () => ParallelAddFilter(imagebuffer, imagedata.Width / 4 * 3, 0, imagedata.Width, imagedata.Height, imagedata.Width, imagedepth, tintFilter, tint)
+            );
 
             Marshal.Copy(imagebuffer, 0, imagedata.Scan0, imagebuffer.Length);
             image.UnlockBits(imagedata);
@@ -237,19 +222,11 @@ namespace Stamper.UI
             Marshal.Copy(imagedata.Scan0, imagebuffer, 0, imagebuffer.Length);
 
             Parallel.Invoke(
-                () =>
-                {
-                    ParallelAddFilter(imagebuffer, 0, 0, imagedata.Width / 4, imagedata.Height, imagedata.Width, imagedepth, specialFilter);
-                }, () =>
-                {
-                    ParallelAddFilter(imagebuffer, imagedata.Width / 4, 0, imagedata.Width / 2, imagedata.Height, imagedata.Width, imagedepth, specialFilter);
-                }, () =>
-                {
-                    ParallelAddFilter(imagebuffer, imagedata.Width / 2, 0, imagedata.Width / 4 * 3, imagedata.Height, imagedata.Width, imagedepth, specialFilter);
-                }, () =>
-                {
-                    ParallelAddFilter(imagebuffer, imagedata.Width / 4 * 3, 0, imagedata.Width, imagedata.Height, imagedata.Width, imagedepth, specialFilter);
-                });
+                () => ParallelAddFilter(imagebuffer, 0, 0, imagedata.Width / 4, imagedata.Height, imagedata.Width, imagedepth, specialFilter),
+                () => ParallelAddFilter(imagebuffer, imagedata.Width / 4, 0, imagedata.Width / 2, imagedata.Height, imagedata.Width, imagedepth, specialFilter),
+                () => ParallelAddFilter(imagebuffer, imagedata.Width / 2, 0, imagedata.Width / 4 * 3, imagedata.Height, imagedata.Width, imagedepth, specialFilter),
+                () => ParallelAddFilter(imagebuffer, imagedata.Width / 4 * 3, 0, imagedata.Width, imagedata.Height, imagedata.Width, imagedepth, specialFilter)
+            );
             
             Marshal.Copy(imagebuffer, 0, imagedata.Scan0, imagebuffer.Length);
             image.UnlockBits(imagedata);
@@ -334,11 +311,26 @@ namespace Stamper.UI
         /// </summary>
         /// <param name="image">The image to generate a mask for.</param>
         /// <returns>The generated mask</returns>
+        /// <remarks>Results will differ between big- and little-endian architectures.</remarks>
         public static Bitmap GenerateMask(Bitmap image)
         {
             var mask = new Bitmap(image.Width, image.Height);
             var queue = new ConcurrentQueue<Coordinate>();
             var set = new ConcurrentDictionary<Coordinate, bool>(); //We only need a set, but C# doesn't have a concurrent implementation
+
+
+            var rect = new Rectangle(0, 0, image.Width, image.Height);
+
+            var imagedata = image.LockBits(rect, ImageLockMode.ReadOnly, image.PixelFormat);
+            var imagedepth = Image.GetPixelFormatSize(imagedata.PixelFormat) / 8;
+            var imagebuffer = new byte[imagedata.Width * imagedata.Height * imagedepth];
+            Marshal.Copy(imagedata.Scan0, imagebuffer, 0, imagebuffer.Length);
+
+            var maskdata = mask.LockBits(rect, ImageLockMode.WriteOnly, mask.PixelFormat);
+            var maskdepth = Image.GetPixelFormatSize(maskdata.PixelFormat) / 8;
+            var maskbuffer = new byte[maskdata.Width * maskdata.Height * maskdepth];
+            Marshal.Copy(maskdata.Scan0, maskbuffer, 0, maskbuffer.Length);
+            
 
             var corners = new List<Coordinate>
             {
@@ -351,39 +343,75 @@ namespace Stamper.UI
             //Enqueue our starting positions.
             foreach (var corner in corners)
             {
-                if (image.GetPixel(corner.X, corner.Y).A == Color.Transparent.A)
-                {
-                    mask.SetPixel(corner.X, corner.Y, _maskColor);
-                    queue.Enqueue(corner);
-                    set.TryAdd(corner, true);
-                }
-            }
-            
-            while (!queue.IsEmpty)
-            {
-                Coordinate coord;
-                if (!queue.TryDequeue(out coord)) continue; //Should never fail, for single-threaded BFS. Important if/when I turn it into a multi-threaded version.
+                var offset = (corner.Y * imagedata.Width + corner.X) * imagedepth;
 
-                foreach (var coordinate in coord.SurroundingCoords(image).Where(c => !set.ContainsKey(c)))
+                if (imagebuffer[offset + 3] == Color.Transparent.A) //If the color is transparent, queue the pixel. Also dependent on endian-ness
                 {
-                    set.TryAdd(coordinate, true);
-                    mask.SetPixel(coordinate.X, coordinate.Y, _maskColor);
-
-                    var imagepixel = image.GetPixel(coordinate.X, coordinate.Y);
-                    if (imagepixel.A == Color.Transparent.A)
+                    //The 32bppArgb format lies to us in regards to the order of channels because of endian-ness. On little-endian architecture the byte-order is BGRA instead of ARGB...
+                    maskbuffer[offset + 0] = _maskColor.B;
+                    maskbuffer[offset + 1] = _maskColor.G;
+                    maskbuffer[offset + 2] = _maskColor.R;
+                    maskbuffer[offset + 3] = _maskColor.A;
+                    if (set.TryAdd(corner, true))
                     {
-                        queue.Enqueue(coordinate);
+                        queue.Enqueue(corner);
                     }
                 }
             }
             
+            var threadStatus = new[] { false, false, false, false };
+            Parallel.Invoke(
+                () => GenerateMaskParallel(imagebuffer, maskbuffer, imagedepth, imagedata.Width, imagedata.Height, queue, set, threadStatus, 0),
+                () => GenerateMaskParallel(imagebuffer, maskbuffer, imagedepth, imagedata.Width, imagedata.Height, queue, set, threadStatus, 1),
+                () => GenerateMaskParallel(imagebuffer, maskbuffer, imagedepth, imagedata.Width, imagedata.Height, queue, set, threadStatus, 2),
+                () => GenerateMaskParallel(imagebuffer, maskbuffer, imagedepth, imagedata.Width, imagedata.Height, queue, set, threadStatus, 3)
+            );
+
+            Marshal.Copy(maskbuffer, 0, maskdata.Scan0, maskbuffer.Length);
+            mask.UnlockBits(maskdata);
+            image.UnlockBits(imagedata);
+
             return mask;
         }
 
-        private class Coordinate
+        private static void GenerateMaskParallel(byte[] imagebuffer, byte[] maskbuffer, int imagedepth, int width, int height,
+            ConcurrentQueue<Coordinate> queue, ConcurrentDictionary<Coordinate, bool> set, bool[] threadIdleStatus, int ownIndex)
         {
-            public int X { get; }
-            public int Y { get; }
+            while (!queue.IsEmpty || !threadIdleStatus.All(i => i))
+            {
+                Coordinate coord;
+                if (queue.TryDequeue(out coord))
+                {
+                    threadIdleStatus[ownIndex] = false;
+                    foreach (var coordinate in coord.SurroundingCoords(width, height).Where(c => !set.ContainsKey(c)))
+                    {
+                        if (!set.TryAdd(coordinate, true)) continue;
+
+                        var offset = (coordinate.Y * width + coordinate.X) * imagedepth;
+
+                        //The 32bppArgb format lies to us in regards to the order of channels because of endian-ness. On little-endian architecture the byte-order is BGRA instead of ARGB...
+                        maskbuffer[offset + 0] = _maskColor.B;
+                        maskbuffer[offset + 1] = _maskColor.G;
+                        maskbuffer[offset + 2] = _maskColor.R;
+                        maskbuffer[offset + 3] = _maskColor.A;
+
+                        if (imagebuffer[offset + 3] == Color.Transparent.A) //If the color is transparent, queue the pixel. Also dependent on endian-ness
+                        {
+                            queue.Enqueue(coordinate);
+                        }
+                    }
+                }
+                else
+                {
+                    threadIdleStatus[ownIndex] = true;
+                }
+            }
+        }
+
+        private struct Coordinate
+        {
+            public readonly int X;
+            public readonly int Y;
 
             public Coordinate(int x, int y)
             {
@@ -391,35 +419,40 @@ namespace Stamper.UI
                 Y = y;
             }
 
-            public IEnumerable<Coordinate> SurroundingCoords(Bitmap image)
+            public IEnumerable<Coordinate> SurroundingCoords(int width, int height)
             {
-                var list = new List<Coordinate>
+                return new[]
                 {
                     new Coordinate(X - 1, Y),
-                    new Coordinate(X, Y - 1),
+                    new Coordinate(X - 1, Y - 1),
+                    new Coordinate(X - 1, Y + 1),
                     new Coordinate(X + 1, Y),
-                    new Coordinate(X, Y + 1)
-                };
-
-                return list.Where(coordinate => coordinate.IsValidLocation(image));
+                    new Coordinate(X + 1, Y - 1),
+                    new Coordinate(X + 1, Y + 1),
+                    new Coordinate(X, Y + 1),
+                    new Coordinate(X, Y - 1)
+                }.Where(coordinate => coordinate.IsValidLocation(width, height));
             }
 
-            private bool IsValidLocation(Bitmap image)
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private bool IsValidLocation(int imageWidth, int imageHeight)
             {
-                return X >= 0 && Y >= 0 && X < image.Width && Y < image.Height;
+                return X >= 0 && Y >= 0 && X < imageWidth && Y < imageHeight;
             }
 
+            // Needed because coords are stored in a ConcurrentDictionary which uses hashing.
             public override bool Equals(object obj)
             {
-                var coord = obj as Coordinate;
-                if (coord == null) return false;
+                if (!(obj is Coordinate)) return false;
 
+                var coord = (Coordinate) obj;
                 return coord.X == X && coord.Y == Y;
             }
 
+            // Needed because coords are stored in a ConcurrentDictionary which uses hashing.
             public override int GetHashCode()
             {
-                return X * 100 + Y;
+                return X * 100000 + Y;
             }
         }
     }
