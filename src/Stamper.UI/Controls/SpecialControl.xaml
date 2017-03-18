@@ -61,7 +61,7 @@
             <Button Grid.Row="0" Grid.Column="1" Content="Color Picker" Command="{Binding BackdropColorPickCommand}"/>
         </Grid>
 
-        <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Text="Text controls:" Margin="0,10,0,0"/>
+        <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Text="Text controls:" Margin="0,10,0,0" FontWeight="SemiBold"/>
         <CheckBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Content="Show text control border" IsChecked="{Binding TextManipulationShowBorder}"/>
         <CheckBox Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Content="Show text" IsChecked="{Binding TextManipulationShowText}"/>
         <Grid Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2">

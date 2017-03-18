@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -56,10 +57,10 @@ namespace Stamper.UI.Windows
                 ZoomControl_Text.Reset();
                 SpecialControl._vm.RotationAngle = "0";
                 SpecialControl._vm.TextRotationAngle = "0";
-                if (_vm.AutoUpdatePreview) RenderImage();
+                if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
             });
             _vm.OpenPreviewWindow = new RelayCommand(o => OpenPreviewWindow(null, null), o => _preWindow == null);
-            _vm.UpdatePreview = new RelayCommand(o => RenderImage(), o => _preWindow != null);
+            _vm.UpdatePreview = new RelayCommand(o => RenderUsingDispatcher(), o => _preWindow != null);
             _vm.SaveToken = new RelayCommand(o => MenuItemSave_OnClick(null, null));
             _vm.LoadToken = new RelayCommand(o => MenuItemLoad_OnClick(null, null));
             _vm.UpdateZoomSpeed = new RelayCommand(o =>
@@ -68,6 +69,11 @@ namespace Stamper.UI.Windows
                 var param = Convert.ToDecimal(o.ToString(), CultureInfo.InvariantCulture);
                 ZoomControl.ZoomSpeed = Convert.ToDouble(param);
             });
+            _vm.PropertyChanged += (sender, args) =>
+            {
+                //When a new image is loaded, update the preview
+                if(args.PropertyName == nameof(_vm.Image) && _vm.AutoUpdatePreview) RenderUsingDispatcher();
+            };
 
             _vm.Image = BitmapHelper.ConvertBitmapToImageSource(DataAccess.Properties.Resources.Splash);
 
@@ -79,10 +85,10 @@ namespace Stamper.UI.Windows
             CheckIfUpdateAvailable();
         }
 
-        private async void CheckIfUpdateAvailable()
+        private async Task<bool> CheckIfUpdateAvailable()
         {
             var result = await UpdateChecker.CheckForUpdate();
-            if (!result.Item1) return;
+            if (!result.Item1) return false;
 
             var win = new UpdateAvailableWindow(result.Item2)
             {
@@ -91,10 +97,11 @@ namespace Stamper.UI.Windows
             };
 
             win.Show();
+            return true;
         }
 
         /// <summary>
-        /// Renders the image when all window rendering has been completed.
+        /// Renders the image when all other window rendering has been completed.
         /// </summary>
         private void RenderUsingDispatcher()
         {
@@ -121,7 +128,7 @@ namespace Stamper.UI.Windows
 
             _vm.OpenPreviewWindow.OnCanExecuteChanged(sender);
             _vm.UpdatePreview.OnCanExecuteChanged(sender);
-            RenderImage();
+            RenderUsingDispatcher();
         }
 
         private Bitmap RenderVisual(Visual element)
@@ -167,16 +174,16 @@ namespace Stamper.UI.Windows
             // Modify the rendered image.
             if (_overlayInfo != null)
             {
-                var overlay = LayerSource.LoadBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
+                var overlay = LayerHelper.LoadBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
                 BitmapHelper.AddFilter(overlay, _overlayTintColor, _overlayTintFilter);
-                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlay, LayerSource.LoadBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolution, _vm.ImageResolution));
+                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlay, LayerHelper.LoadBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolution, _vm.ImageResolution));
                 BitmapHelper.AddLayerToImage(bitmap, overlay);
             }
 
             if (_borderInfo != null)
             {
-                if (!string.IsNullOrWhiteSpace(_borderInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(bitmap, LayerSource.LoadBitmapFromFile(_borderInfo.Info.Mask, _vm.ImageResolution, _vm.ImageResolution));
-                var border = LayerSource.LoadBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
+                if (!string.IsNullOrWhiteSpace(_borderInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(bitmap, LayerHelper.LoadBitmapFromFile(_borderInfo.Info.Mask, _vm.ImageResolution, _vm.ImageResolution));
+                var border = LayerHelper.LoadBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
                 BitmapHelper.AddFilter(border, _borderTintColor, _borderTintFilter);
                 BitmapHelper.AddLayerToImage(bitmap, border);  //Draw the border
             }
@@ -197,7 +204,7 @@ namespace Stamper.UI.Windows
             if (_borderInfo != null)
             {
                 //Border
-                var borderImage = LayerSource.LoadBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
+                var borderImage = LayerHelper.LoadBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
                 BitmapHelper.AddFilter(borderImage, _borderTintColor, _borderTintFilter);
 
                 BorderImage.Source = BitmapHelper.ConvertBitmapToImageSource(borderImage);
@@ -208,16 +215,16 @@ namespace Stamper.UI.Windows
             if (_overlayInfo != null)
             {
                 //Overlay
-                var overlayImage = LayerSource.LoadBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
+                var overlayImage = LayerHelper.LoadBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
                 BitmapHelper.AddFilter(overlayImage, _overlayTintColor, _overlayTintFilter);
-                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlayImage, LayerSource.LoadBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolution, _vm.ImageResolution));
+                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlayImage, LayerHelper.LoadBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolution, _vm.ImageResolution));
 
                 OverlayImage.Source = BitmapHelper.ConvertBitmapToImageSource(overlayImage);
                 OverlayImage.Height = _vm.ImageResolution;
                 OverlayImage.Width = _vm.ImageResolution;
             }
 
-            if (_vm.AutoUpdatePreview) RenderImage();
+            if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
         }
 
         #region Layer Selection
@@ -284,7 +291,7 @@ namespace Stamper.UI.Windows
             {
                 _vm.RotationAngle = num;
             }
-            if (_vm.AutoUpdatePreview) RenderImage();
+            if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
         }
 
         private void SpecialControl_OnTextManipulationChanged(object sender, RoutedEventArgs e)
@@ -318,7 +325,7 @@ namespace Stamper.UI.Windows
                 _vm.TextRotationAngle = num;
             }
 
-            if (_vm.AutoUpdatePreview) RenderImage();
+            if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
         }
 
         private void SpecialControl_OnButtonZoom(object sender, RoutedEventArgs e)
@@ -522,7 +529,7 @@ namespace Stamper.UI.Windows
 
         private void ZoomControl_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (_vm.AutoUpdatePreview) RenderImage();
+            if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
         }
 
         private void ZoomControl_OnMouseWheel(object sender, MouseWheelEventArgs e)
@@ -538,7 +545,7 @@ namespace Stamper.UI.Windows
         {
             var dt = sender as DispatcherTimer;
             dt.Stop();
-            RenderImage();
+            RenderUsingDispatcher();
         }
 
         private void ZoomControl_Text_OnRotation(object sender, RoutedEventArgs e)
@@ -555,5 +562,11 @@ namespace Stamper.UI.Windows
             SpecialControl._vm.RotationAngle = _vm.RotationAngle.ToString();
         }
         #endregion
+
+        private async void MenuItemCheckForUpdate_OnClick(object sender, RoutedEventArgs e)
+        {
+            var updateAvailable = await CheckIfUpdateAvailable();
+            if(!updateAvailable) MessageBox.Show(this, $"No update is available.\nCurrent version: {DataAccess.Properties.Settings.Default.Version}", "No update");
+        }
     }
 }

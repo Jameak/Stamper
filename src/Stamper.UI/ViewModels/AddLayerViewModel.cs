@@ -69,7 +69,7 @@ namespace Stamper.UI.ViewModels
             }
 
             Bitmap image; //Image in its actual size
-            var loadedImage = LayerSource.TryLoadBitmapFromFile(File, out image);
+            var loadedImage = LayerHelper.TryLoadBitmapFromFile(File, out image);
             if (!loadedImage) return false;
             Bitmap imageSmall = BitmapHelper.ConvertToPixelFormat_32bppArgb(new Bitmap(image, PreviewSize, PreviewSize)); //Image scaled to the size of the preview.
 
@@ -90,7 +90,7 @@ namespace Stamper.UI.ViewModels
                                 break; 
                             }
 
-                            var loadedMask = LayerSource.TryLoadBitmapFromFile(Mask, out mask, PreviewSize, PreviewSize);
+                            var loadedMask = LayerHelper.TryLoadBitmapFromFile(Mask, out mask, PreviewSize, PreviewSize);
                             if (!loadedMask) return false;
 
                             BitmapHelper.ApplyMaskToImage(backdrop, mask); //For Border-layers we apply the mask to the backdrop
@@ -121,7 +121,7 @@ namespace Stamper.UI.ViewModels
                                 break;
                             }
 
-                            var loadedMask = LayerSource.TryLoadBitmapFromFile(Mask, out mask, PreviewSize, PreviewSize);
+                            var loadedMask = LayerHelper.TryLoadBitmapFromFile(Mask, out mask, PreviewSize, PreviewSize);
                             if (!loadedMask) return false;
 
                             BitmapHelper.ApplyMaskToImage(imageSmall, mask); //For Overlay-layers we apply the mask to the overlay

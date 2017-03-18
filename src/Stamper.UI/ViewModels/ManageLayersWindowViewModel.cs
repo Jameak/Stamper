@@ -26,11 +26,11 @@ namespace Stamper.UI.ViewModels
 
             var previewResolution = 40;
 
-            foreach (var layer in LayerSource.GetLayers())
+            foreach (var layer in LayerHelper.GetLayers())
             {
                 Layers.Add(new LayerEntry
                 {
-                    Image = BitmapHelper.ConvertBitmapToImageSource(LayerSource.LoadBitmapFromFile(layer.File, previewResolution, previewResolution)),
+                    Image = BitmapHelper.ConvertBitmapToImageSource(LayerHelper.LoadBitmapFromFile(layer.File, previewResolution, previewResolution)),
                     Info = layer
                 });
             }

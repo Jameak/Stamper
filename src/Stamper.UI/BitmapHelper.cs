@@ -28,11 +28,11 @@ namespace Stamper.UI
         private static Color _maskColor = Color.FromArgb(255, 0, 255, 0);
 
         /// <summary>
-        /// <see cref="LayerSource.ConvertBitmapToPixelFormat_32bppArgb(Bitmap)"/>
+        /// <see cref="LayerHelper.ConvertBitmapToPixelFormat_32bppArgb(Bitmap)"/>
         /// </summary>
         public static Bitmap ConvertToPixelFormat_32bppArgb(Bitmap image)
         {
-            return LayerSource.ConvertBitmapToPixelFormat_32bppArgb(image);
+            return LayerHelper.ConvertBitmapToPixelFormat_32bppArgb(image);
         }
 
         /// <summary>

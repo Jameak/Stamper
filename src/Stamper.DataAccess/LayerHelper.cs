@@ -15,7 +15,7 @@ using Rectangle = System.Drawing.Rectangle;
 
 namespace Stamper.DataAccess
 {
-    public static class LayerSource
+    public static class LayerHelper
     {
         private const string LayerDirectory = "layers";
         private const string CustomDirectory = "custom";
@@ -47,6 +47,14 @@ namespace Stamper.DataAccess
             return list;
         }
         
+        /// <summary>
+        /// Creates a new layer by copying the referenced paths into the custom layer directory
+        /// and creates a .json file representing the layer at the layer path.
+        /// </summary>
+        /// <param name="name">The name of the layer. (Not the name of the resulting layer-file)</param>
+        /// <param name="filepath">A path to the main image file</param>
+        /// <param name="maskpath">A path to the mask file</param>
+        /// <param name="type">The layer type</param>
         public static bool CreateNewLayer(string name, string filepath, string maskpath, Layer.LayerType type)
         {
             var layer = new Layer {File = filepath, Mask = maskpath, Name = name, Type = type};
@@ -101,29 +109,14 @@ namespace Stamper.DataAccess
         /// </summary>
         public static Bitmap LoadBitmapFromFile(string path, int? width = null, int? height = null)
         {
-            try
-            {
-                if (Path.GetExtension(path) == ".svg")
-                {
-                    return width.HasValue && height.HasValue
-                        ? GetBitmapFromSvg(path, width.Value, height.Value)
-                        : GetBitmapFromSvg(path);
-                }
-
-                return width.HasValue && height.HasValue
-                        ? GetBitmapFromFile(path, width.Value, height.Value)
-                        : GetBitmapFromFile(path);
-            }
-            catch (Exception e) when (e is ArgumentException || e is IOException )
-            {
-
-                var image = width.HasValue && height.HasValue
-                    ? new Bitmap(width.Value, height.Value)
-                    : new Bitmap(100, 100);
-                return ConvertBitmapToPixelFormat_32bppArgb(image);
-            }
+            Bitmap image;
+            TryLoadBitmapFromFile(path, out image, width, height);
+            return image;
         }
 
+        /// <summary>
+        /// <see cref="LoadBitmapFromFile"/>
+        /// </summary>
         public static bool TryLoadBitmapFromFile(string path, out Bitmap bitmap, int? width = null, int? height = null)
         {
             try

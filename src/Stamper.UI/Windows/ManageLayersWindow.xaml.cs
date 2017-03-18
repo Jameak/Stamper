@@ -31,7 +31,7 @@ namespace Stamper.UI.Windows
             {
                 if (LayerList.SelectedItem != null)
                 {
-                    LayerSource.DeleteLayer(((ManageLayersWindowViewModel.LayerEntry)LayerList.SelectedItem).Info);
+                    LayerHelper.DeleteLayer(((ManageLayersWindowViewModel.LayerEntry)LayerList.SelectedItem).Info);
                     _vm.ReloadLayers();
                 }
             });

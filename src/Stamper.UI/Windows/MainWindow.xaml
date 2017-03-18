@@ -51,6 +51,7 @@
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_Show instructions" Click="MenuItemLoadInstructions_OnClick"/>
+                <MenuItem Header="_Check for updates" Click="MenuItemCheckForUpdate_OnClick"/>
                 <MenuItem Header="_Ratelimit Info" Click="MenuItemRatelimiter_OnClick"/>
                 <MenuItem Header="_About" Click="MenuItemAbout_OnClick"/>
             </MenuItem>

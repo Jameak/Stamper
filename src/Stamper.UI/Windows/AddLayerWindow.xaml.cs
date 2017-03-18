@@ -115,10 +115,10 @@ namespace Stamper.UI.Windows
             {
                 if (RadioButton_Auto.IsChecked != null && RadioButton_Auto.IsChecked.Value)
                 {
-                    _vm.Mask = LayerSource.SaveCustomMask(_vm.GeneratedMask);
+                    _vm.Mask = LayerHelper.SaveCustomMask(_vm.GeneratedMask);
                 }
 
-                var success = LayerSource.CreateNewLayer(_vm.Name, _vm.File, _vm.Mask, (Layer.LayerType) LayerType.SelectedItem);
+                var success = LayerHelper.CreateNewLayer(_vm.Name, _vm.File, _vm.Mask, (Layer.LayerType) LayerType.SelectedItem);
                 if (success)
                 {
                     OkClicked = true;
