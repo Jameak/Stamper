@@ -47,18 +47,29 @@ namespace Stamper.DataAccess
             {
                 var val = await result.Content.ReadAsStringAsync();
                 var response = JsonConvert.DeserializeObject<List<GithubRelease>>(val);
-
-
+                
                 var currentVersion = ParseVersion(Properties.Settings.Default.Version);
                 foreach (var githubRelease in response)
                 {
                     if (!githubRelease.Draft && !githubRelease.Prerelease)
                     {
                         var releaseVersion = ParseVersion(githubRelease.Tag_name);
+                        
+                        if (currentVersion.Item1 < releaseVersion.Item1)
+                        {
+                            return new Tuple<bool, string>(true, githubRelease.Tag_name);
+                        }
 
-                        if (currentVersion.Item1 < releaseVersion.Item1) return new Tuple<bool, string>(true, githubRelease.Tag_name);
-                        if (currentVersion.Item2 < releaseVersion.Item2) return new Tuple<bool, string>(true, githubRelease.Tag_name);
-                        if (currentVersion.Item3 < releaseVersion.Item3) return new Tuple<bool, string>(true, githubRelease.Tag_name);
+                        if (currentVersion.Item1 == releaseVersion.Item1 && currentVersion.Item2 < releaseVersion.Item2)
+                        {
+                            return new Tuple<bool, string>(true, githubRelease.Tag_name);
+                        }
+                            
+                        if (currentVersion.Item1 == releaseVersion.Item1 && currentVersion.Item2 == releaseVersion.Item2 &&
+                            currentVersion.Item3 < releaseVersion.Item3)
+                        {
+                            return new Tuple<bool, string>(true, githubRelease.Tag_name);
+                        }
                     }
                 }
             }
