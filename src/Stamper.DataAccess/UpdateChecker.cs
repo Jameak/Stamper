@@ -22,16 +22,16 @@ namespace Stamper.DataAccess
 
         /// <summary>
         /// Checks if a new non-draft, non-prerelease version has been released on GitHub.
-        /// Always returns false if the user has chosen to ignore updates.
+        /// Returns false if the user has chosen to ignore updates, unless forceCheck is true.
         /// </summary>
         /// <returns>
         /// A Tuple where:
         /// Item 1: bool indicating whether an update is available.
         /// Item 2: The version number of the updated release. Empty string or null if no update is available.
         /// </returns>
-        public static async Task<Tuple<bool, string>> CheckForUpdate()
+        public static async Task<Tuple<bool, string>> CheckForUpdate(bool forceCheck)
         {
-            if (Properties.Settings.Default.IgnoreUpdates) return new Tuple<bool, string>(false, string.Empty);
+            if (Properties.Settings.Default.IgnoreUpdates && !forceCheck) return new Tuple<bool, string>(false, string.Empty);
 
             HttpResponseMessage result;
             try

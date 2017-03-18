@@ -82,12 +82,12 @@ namespace Stamper.UI.Windows
             _timer.Tick += TimerTicked;
             _timer.Interval = TimeSpan.FromMilliseconds(200);
 
-            CheckIfUpdateAvailable();
+            CheckIfUpdateAvailable(false);
         }
 
-        private async Task<bool> CheckIfUpdateAvailable()
+        private async Task<bool> CheckIfUpdateAvailable(bool forceCheck)
         {
-            var result = await UpdateChecker.CheckForUpdate();
+            var result = await UpdateChecker.CheckForUpdate(forceCheck);
             if (!result.Item1) return false;
 
             var win = new UpdateAvailableWindow(result.Item2)
@@ -565,7 +565,7 @@ namespace Stamper.UI.Windows
 
         private async void MenuItemCheckForUpdate_OnClick(object sender, RoutedEventArgs e)
         {
-            var updateAvailable = await CheckIfUpdateAvailable();
+            var updateAvailable = await CheckIfUpdateAvailable(true);
             if(!updateAvailable) MessageBox.Show(this, $"No update is available.\nCurrent version: {DataAccess.Properties.Settings.Default.Version}", "No update");
         }
     }
