@@ -81,14 +81,29 @@ namespace Stamper.UI
             var maskdepth = Image.GetPixelFormatSize(maskdata.PixelFormat) / 8;
             var maskbuffer = new byte[maskdata.Width * maskdata.Height * maskdepth];
             Marshal.Copy(maskdata.Scan0, maskbuffer, 0, maskbuffer.Length);
-
-            Parallel.Invoke(
-                () => ParallelApplyMaskToImage(maskbuffer, imagebuffer, 0, 0, maskdata.Width / 4, maskdata.Height, maskdata.Width, maskdepth),
-                () => ParallelApplyMaskToImage(maskbuffer, imagebuffer, maskdata.Width / 4, 0, maskdata.Width / 2, maskdata.Height, maskdata.Width, maskdepth),
-                () => ParallelApplyMaskToImage(maskbuffer, imagebuffer, maskdata.Width / 2, 0, maskdata.Width / 4 * 3, maskdata.Height, maskdata.Width, maskdepth),
-                () => ParallelApplyMaskToImage(maskbuffer, imagebuffer, maskdata.Width / 4 * 3, 0, maskdata.Width, maskdata.Height, maskdata.Width, maskdepth)
-            );
             
+
+            Parallel.For(0, maskdata.Width, x =>
+            {
+                for (int y = 0; y < maskdata.Height; y++)
+                {
+                    var offset = (y * maskdata.Width + x) * maskdepth;
+                    //The 32bppArgb format lies to us in regards to the order of channels because of endian-ness. On little-endian architecture the byte-order is BGRA instead of ARGB...
+                    var B = maskbuffer[offset + 0];
+                    var G = maskbuffer[offset + 1];
+                    var R = maskbuffer[offset + 2];
+                    var A = maskbuffer[offset + 3];
+
+                    //If the color matches our mask-color, then make it transparent.
+                    if (R == _maskColor.R && G == _maskColor.G && B == _maskColor.B && A == _maskColor.A)
+                    {
+                        imagebuffer[offset + 0] = 0;
+                        imagebuffer[offset + 1] = 0;
+                        imagebuffer[offset + 2] = 0;
+                        imagebuffer[offset + 3] = 0;
+                    }
+                }
+            });
 
             Marshal.Copy(imagebuffer, 0, imagedata.Scan0, imagebuffer.Length);
             image.UnlockBits(imagedata);
@@ -106,31 +121,6 @@ namespace Stamper.UI
             //        }
             //    }
             //}
-        }
-
-        private static void ParallelApplyMaskToImage(byte[] maskbuffer, byte[] imagebuffer, int startx, int starty, int endx, int endy, int width, int depth)
-        {
-            for (int x = startx; x < endx; x++)
-            {
-                for (int y = starty; y < endy; y++)
-                {
-                    var offset = (y * width + x) * depth;
-                    //The 32bppArgb format lies to us in regards to the order of channels because of endian-ness. On little-endian architecture the byte-order is BGRA instead of ARGB...
-                    var B = maskbuffer[offset + 0];
-                    var G = maskbuffer[offset + 1];
-                    var R = maskbuffer[offset + 2];
-                    var A = maskbuffer[offset + 3];
-
-                    //If the color matches our mask-color, then make it transparent.
-                    if (R == _maskColor.R && G == _maskColor.G && B == _maskColor.B && A == _maskColor.A)
-                    {
-                        imagebuffer[offset + 0] = 0;
-                        imagebuffer[offset + 1] = 0;
-                        imagebuffer[offset + 2] = 0;
-                        imagebuffer[offset + 3] = 0;
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -170,24 +160,11 @@ namespace Stamper.UI
             var imagebuffer = new byte[imagedata.Width * imagedata.Height * imagedepth];
             Marshal.Copy(imagedata.Scan0, imagebuffer, 0, imagebuffer.Length);
 
-            Parallel.Invoke(
-                () => ParallelAddFilter(imagebuffer, 0, 0, imagedata.Width / 4, imagedata.Height, imagedata.Width, imagedepth, tintFilter, tint),
-                () => ParallelAddFilter(imagebuffer, imagedata.Width / 4, 0, imagedata.Width / 2, imagedata.Height, imagedata.Width, imagedepth, tintFilter, tint),
-                () => ParallelAddFilter(imagebuffer, imagedata.Width / 2, 0, imagedata.Width / 4 * 3, imagedata.Height, imagedata.Width, imagedepth, tintFilter, tint),
-                () => ParallelAddFilter(imagebuffer, imagedata.Width / 4 * 3, 0, imagedata.Width, imagedata.Height, imagedata.Width, imagedepth, tintFilter, tint)
-            );
-
-            Marshal.Copy(imagebuffer, 0, imagedata.Scan0, imagebuffer.Length);
-            image.UnlockBits(imagedata);
-        }
-
-        private static void ParallelAddFilter(byte[] imagebuffer, int startx, int starty, int endx, int endy, int width, int depth, FilterMethods.TintFilterDelegate tintFilter, Color tint)
-        {
-            for (int x = startx; x < endx; x++)
+            Parallel.For(0, imagedata.Width, x =>
             {
-                for (int y = starty; y < endy; y++)
+                for (int y = 0; y < imagedata.Height; y++)
                 {
-                    var offset = (y * width + x) * depth;
+                    var offset = (y * imagedata.Width + x) * imagedepth;
                     //The 32bppArgb format lies to us in regards to the order of channels because of endian-ness. On little-endian architecture the byte-order is BGRA instead of ARGB...
                     var B = imagebuffer[offset + 0];
                     var G = imagebuffer[offset + 1];
@@ -200,7 +177,10 @@ namespace Stamper.UI
                     imagebuffer[offset + 2] = (byte)result.Item1;
                     imagebuffer[offset + 3] = (byte)result.Item4;
                 }
-            }
+            });
+
+            Marshal.Copy(imagebuffer, 0, imagedata.Scan0, imagebuffer.Length);
+            image.UnlockBits(imagedata);
         }
 
         /// <summary>
@@ -221,24 +201,11 @@ namespace Stamper.UI
             var imagebuffer = new byte[imagedata.Width * imagedata.Height * imagedepth];
             Marshal.Copy(imagedata.Scan0, imagebuffer, 0, imagebuffer.Length);
 
-            Parallel.Invoke(
-                () => ParallelAddFilter(imagebuffer, 0, 0, imagedata.Width / 4, imagedata.Height, imagedata.Width, imagedepth, specialFilter),
-                () => ParallelAddFilter(imagebuffer, imagedata.Width / 4, 0, imagedata.Width / 2, imagedata.Height, imagedata.Width, imagedepth, specialFilter),
-                () => ParallelAddFilter(imagebuffer, imagedata.Width / 2, 0, imagedata.Width / 4 * 3, imagedata.Height, imagedata.Width, imagedepth, specialFilter),
-                () => ParallelAddFilter(imagebuffer, imagedata.Width / 4 * 3, 0, imagedata.Width, imagedata.Height, imagedata.Width, imagedepth, specialFilter)
-            );
-            
-            Marshal.Copy(imagebuffer, 0, imagedata.Scan0, imagebuffer.Length);
-            image.UnlockBits(imagedata);
-        }
-
-        private static void ParallelAddFilter(byte[] imagebuffer, int startx, int starty, int endx, int endy, int width, int depth, FilterMethods.SpecialFilterDelegate specialFilter)
-        {
-            for (int x = startx; x < endx; x++)
+            Parallel.For(0, imagedata.Width, x =>
             {
-                for (int y = starty; y < endy; y++)
+                for (int y = 0; y < imagedata.Height; y++)
                 {
-                    var offset = (y * width + x) * depth;
+                    var offset = (y * imagedata.Width + x) * imagedepth;
                     //The 32bppArgb format lies to us in regards to the order of channels because of endian-ness. On little-endian architecture the byte-order is BGRA instead of ARGB...
                     var B = imagebuffer[offset + 0];
                     var G = imagebuffer[offset + 1];
@@ -251,7 +218,10 @@ namespace Stamper.UI
                     imagebuffer[offset + 2] = (byte)result.Item1;
                     imagebuffer[offset + 3] = (byte)result.Item4;
                 }
-            }
+            });
+            
+            Marshal.Copy(imagebuffer, 0, imagedata.Scan0, imagebuffer.Length);
+            image.UnlockBits(imagedata);
         }
 
         public static async Task<Bitmap> LoadBitmapAsync(string path)
@@ -329,7 +299,6 @@ namespace Stamper.UI
             var maskdata = mask.LockBits(rect, ImageLockMode.WriteOnly, mask.PixelFormat);
             var maskdepth = Image.GetPixelFormatSize(maskdata.PixelFormat) / 8;
             var maskbuffer = new byte[maskdata.Width * maskdata.Height * maskdepth];
-            Marshal.Copy(maskdata.Scan0, maskbuffer, 0, maskbuffer.Length);
             
 
             var corners = new List<Coordinate>
@@ -359,14 +328,18 @@ namespace Stamper.UI
                 }
             }
             
-            var threadStatus = new[] { false, false, false, false };
-            Parallel.Invoke(
-                () => GenerateMaskParallel(imagebuffer, maskbuffer, imagedepth, imagedata.Width, imagedata.Height, queue, set, threadStatus, 0),
-                () => GenerateMaskParallel(imagebuffer, maskbuffer, imagedepth, imagedata.Width, imagedata.Height, queue, set, threadStatus, 1),
-                () => GenerateMaskParallel(imagebuffer, maskbuffer, imagedepth, imagedata.Width, imagedata.Height, queue, set, threadStatus, 2),
-                () => GenerateMaskParallel(imagebuffer, maskbuffer, imagedepth, imagedata.Width, imagedata.Height, queue, set, threadStatus, 3)
-            );
+            //We want to invoke the action the same number of times as logical processors on the system.
+            var threadStatus = new bool[Environment.ProcessorCount];
+            var actions = new Action[Environment.ProcessorCount];
+            for (int i = 0; i < Environment.ProcessorCount; i++)
+            {
+                var i1 = i; // Copy to local variable to avoid a modified closure in the lambda
+                actions[i] = () => GenerateMaskParallel(imagebuffer, maskbuffer, imagedepth, imagedata.Width, imagedata.Height, queue,
+                        set, threadStatus, i1);
+            }
 
+            Parallel.Invoke(actions);
+            
             Marshal.Copy(maskbuffer, 0, maskdata.Scan0, maskbuffer.Length);
             mask.UnlockBits(maskdata);
             image.UnlockBits(imagedata);
