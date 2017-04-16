@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Stamper.DataAccess;
 using Stamper.UI.ViewModels.Base;
 using Stamper.UI.ViewModels.Enums;
 using FontFamily = System.Windows.Media.FontFamily;
@@ -15,12 +16,33 @@ namespace Stamper.UI.ViewModels
 {
     public class MainWindowViewModel : BaseViewModel
     {
-        private int _imageResolution = 512;
-        public int ImageResolution { get { return _imageResolution; } set { if (_imageResolution != value) { _imageResolution = value; OnPropertyChanged(); } } }
+        private const int STARTUP_RESOLUTION = 512;
+        public ImageLoader.FitMode FitMode { get; private set; } = ImageLoader.FitMode.Stretch;
+
+        //The resolution that the user wants the output image to be.
+        public int DesiredResolutionWidth { get; private set; } = STARTUP_RESOLUTION;
+        public int DesiredResolutionHeight { get; private set; } = STARTUP_RESOLUTION;
+
+        //The resolution of the currently chosen border or overlay.
+        public int ActualResolutionWidth { get; private set; } = STARTUP_RESOLUTION;
+        public int ActualResolutionHeight { get; private set; } = STARTUP_RESOLUTION;
+
+        //The resolution given to the border and overlays after adhering to the chosen FitMode. Will be equal to DesiredResolutionWidth/Height if the FitMode is set to Stretch
+        private int _imageResolutionWidth = STARTUP_RESOLUTION;
+        public int ImageResolutionWidth { get { return _imageResolutionWidth; } private set { if (_imageResolutionWidth != value) { _imageResolutionWidth = value; OnPropertyChanged(); } } }
+
+        private int _imageResolutionHeight = STARTUP_RESOLUTION;
+        public int ImageResolutionHeight { get { return _imageResolutionHeight; } private set { if (_imageResolutionHeight != value) { _imageResolutionHeight = value; OnPropertyChanged(); } } }
         
         private BitmapImage _image;
         public BitmapImage Image { get { return _image; } set { if (!Equals(_image, value)) { _image = value; OnPropertyChanged(); } } }
 
+        private BitmapImage _borderImage;
+        public BitmapImage BorderImage { get { return _borderImage; } set { if (!Equals(_borderImage, value)) { _borderImage = value; OnPropertyChanged(); } } }
+
+        private BitmapImage _overlayImage;
+        public BitmapImage OverlayImage { get { return _overlayImage; } set { if (!Equals(_overlayImage, value)) { _overlayImage = value; OnPropertyChanged(); } } }
+        
         private bool _autoUpdatePreview;
         public bool AutoUpdatePreview { get { return _autoUpdatePreview; } set { if (_autoUpdatePreview != value) { _autoUpdatePreview = value; OnPropertyChanged(); } } }
 
@@ -98,6 +120,18 @@ namespace Stamper.UI.ViewModels
             {
                 Image = BitmapHelper.ConvertBitmapToImageSource(DataAccess.Properties.Resources.LoadFailure);
             }
+        }
+
+        public void SetDimensions(ImageLoader.FitMode mode, int desiredWidth, int desiredHeight, int imageWidth, int imageHeight)
+        {
+            FitMode = mode;
+            DesiredResolutionWidth = desiredWidth;
+            DesiredResolutionHeight = desiredHeight;
+            ActualResolutionWidth = imageWidth;
+            ActualResolutionHeight = imageHeight;
+            var resolutions = ImageLoader.FitDimensions(FitMode, DesiredResolutionWidth, DesiredResolutionHeight, ActualResolutionWidth, ActualResolutionHeight);
+            ImageResolutionWidth = resolutions.Item1;
+            ImageResolutionHeight = resolutions.Item2;
         }
     }
 }

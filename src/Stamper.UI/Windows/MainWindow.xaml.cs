@@ -48,7 +48,22 @@ namespace Stamper.UI.Windows
 
             _vm.UpdateResolution = new RelayCommand(param =>
             {
-                if (param != null) _vm.ImageResolution = int.Parse(param.ToString());
+                if (param != null)
+                {
+                    if (param is Tuple<int,int,ImageLoader.FitMode>)
+                    {
+                        var tuple = (Tuple<int, int, ImageLoader.FitMode>) param;
+                        _vm.SetDimensions(tuple.Item3, tuple.Item1, tuple.Item2, _vm.ActualResolutionWidth, _vm.ActualResolutionHeight);
+                    }
+                    else
+                    {
+                        int res;
+                        if (int.TryParse(param.ToString(), out res))
+                        {
+                            _vm.SetDimensions(_vm.FitMode, res, res, _vm.ActualResolutionWidth, _vm.ActualResolutionHeight);
+                        }
+                    }
+                }
                 UpdateOverlays();
             });
             _vm.ResetImageCommand = new RelayCommand(o =>
@@ -116,8 +131,8 @@ namespace Stamper.UI.Windows
             var topmargin = 30;
 
             _preWindow = new PreviewWindow(new PreviewWindowViewModel());
-            _preWindow.Height = Math.Max(164, _vm.ImageResolution) + topmargin * 2;
-            _preWindow.Width = Math.Max(164, _vm.ImageResolution) + sidemargin * 2;
+            _preWindow.Height = Math.Max(164, _vm.ImageResolutionHeight) + topmargin * 2;
+            _preWindow.Width = Math.Max(164, _vm.ImageResolutionWidth) + sidemargin * 2;
             _preWindow.Closed += (o, args) =>
             {
                 _preWindow = null;
@@ -135,7 +150,7 @@ namespace Stamper.UI.Windows
         {
             //Setting image offset and size.
             var offsetFromTopLeft = new Point(ZoomControl.ActualWidth / 2 - RenderLocation.ActualWidth / 2, ZoomControl.ActualHeight / 2 - RenderLocation.ActualHeight / 2);
-            var imageSize = new Size(_vm.ImageResolution, _vm.ImageResolution);
+            var imageSize = new Size(_vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
 
             //Rendering part of visual.
             var brush = new VisualBrush(element)
@@ -174,16 +189,16 @@ namespace Stamper.UI.Windows
             // Modify the rendered image.
             if (_overlayInfo != null)
             {
-                var overlay = LayerHelper.LoadBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
+                var overlay = ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
                 BitmapHelper.AddFilter(overlay, _overlayTintColor, _overlayTintFilter);
-                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlay, LayerHelper.LoadBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolution, _vm.ImageResolution));
+                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlay, ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight));
                 BitmapHelper.AddLayerToImage(bitmap, overlay);
             }
 
             if (_borderInfo != null)
             {
-                if (!string.IsNullOrWhiteSpace(_borderInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(bitmap, LayerHelper.LoadBitmapFromFile(_borderInfo.Info.Mask, _vm.ImageResolution, _vm.ImageResolution));
-                var border = LayerHelper.LoadBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
+                if (!string.IsNullOrWhiteSpace(_borderInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(bitmap, ImageLoader.LoadBitmapFromFile(_borderInfo.Info.Mask, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight));
+                var border = ImageLoader.LoadBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
                 BitmapHelper.AddFilter(border, _borderTintColor, _borderTintFilter);
                 BitmapHelper.AddLayerToImage(bitmap, border);  //Draw the border
             }
@@ -195,33 +210,45 @@ namespace Stamper.UI.Windows
             }
 
             //Since we just spent time rendering the image, we might as well update the preview even if the user didn't ask for that specifically.
-            _preWindow?.SetImage(bitmap, _vm.ImageResolution, _vm.ImageResolution);
+            _preWindow?.SetImage(bitmap, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
             return bitmap;
         }
 
         private void UpdateOverlays()
         {
+            //When updating overlays, the actual output resolution may be different from the desired resolution if stretching of overlays isn't allowed.
+            if (_borderInfo != null)
+            {
+                var border = ImageLoader.LoadBitmapFromFile(_borderInfo.Info.File);
+                _vm.SetDimensions(_vm.FitMode, _vm.DesiredResolutionWidth, _vm.DesiredResolutionHeight, border.Width, border.Height);
+            }
+            else if (_overlayInfo != null)
+            {
+                var overlay = ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.File);
+                _vm.SetDimensions(_vm.FitMode, _vm.DesiredResolutionWidth, _vm.DesiredResolutionHeight, overlay.Width, overlay.Height);
+            }
+
             if (_borderInfo != null)
             {
                 //Border
-                var borderImage = LayerHelper.LoadBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
+                var borderImage = ImageLoader.LoadBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
                 BitmapHelper.AddFilter(borderImage, _borderTintColor, _borderTintFilter);
 
-                BorderImage.Source = BitmapHelper.ConvertBitmapToImageSource(borderImage);
-                BorderImage.Height = _vm.ImageResolution;
-                BorderImage.Width = _vm.ImageResolution;
+                _vm.BorderImage = BitmapHelper.ConvertBitmapToImageSource(borderImage);
+                BorderImage.Height = _vm.ImageResolutionHeight;
+                BorderImage.Width = _vm.ImageResolutionWidth;
             }
 
             if (_overlayInfo != null)
             {
                 //Overlay
-                var overlayImage = LayerHelper.LoadBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolution, _vm.ImageResolution);
+                var overlayImage = ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
                 BitmapHelper.AddFilter(overlayImage, _overlayTintColor, _overlayTintFilter);
-                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlayImage, LayerHelper.LoadBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolution, _vm.ImageResolution));
+                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlayImage, ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight));
 
-                OverlayImage.Source = BitmapHelper.ConvertBitmapToImageSource(overlayImage);
-                OverlayImage.Height = _vm.ImageResolution;
-                OverlayImage.Width = _vm.ImageResolution;
+                _vm.OverlayImage = BitmapHelper.ConvertBitmapToImageSource(overlayImage);
+                OverlayImage.Height = _vm.ImageResolutionHeight;
+                OverlayImage.Width = _vm.ImageResolutionWidth;
             }
 
             if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
@@ -444,7 +471,7 @@ namespace Stamper.UI.Windows
 
         private void MenuItemCustomSize_OnClick(object sender, RoutedEventArgs e)
         {
-            var win = new CustomSizeWindow
+            var win = new CustomSizeWindow(_vm.FitMode)
             {
                 Owner = this,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner
@@ -454,11 +481,22 @@ namespace Stamper.UI.Windows
 
             win.Closing += (o, args) =>
             {
-                int num;
+                int width;
+                int height;
 
-                if (win.OkClicked && !string.IsNullOrWhiteSpace(win.SizeInput.Text) && int.TryParse(win.SizeInput.Text, out num))
+                if (win.OkClicked && !string.IsNullOrWhiteSpace(win.Width.Text) && int.TryParse(win.Width.Text, out width) && !string.IsNullOrWhiteSpace(win.Height.Text) && int.TryParse(win.Height.Text, out height))
                 {
-                    _vm.UpdateResolution.Execute(num);
+                    if (win.Stretch.IsChecked.HasValue && win.Stretch.IsChecked.Value)
+                    {
+                        _vm.UpdateResolution.Execute(new Tuple<int, int, ImageLoader.FitMode>(width, height, ImageLoader.FitMode.Stretch));
+                        return;
+                    }
+
+                    if (win.Fill.IsChecked.HasValue && win.Fill.IsChecked.Value)
+                    {
+                        _vm.UpdateResolution.Execute(new Tuple<int, int, ImageLoader.FitMode>(width, height, ImageLoader.FitMode.Fill));
+                        return;
+                    }
                 }
             };
         }
@@ -489,6 +527,12 @@ namespace Stamper.UI.Windows
                 Borders.RefreshLayers();
                 Overlays.RefreshLayers();
             };
+        }
+
+        private async void MenuItemCheckForUpdate_OnClick(object sender, RoutedEventArgs e)
+        {
+            var updateAvailable = await CheckIfUpdateAvailable(true);
+            if (!updateAvailable) MessageBox.Show(this, $"No update is available.\nCurrent version: {DataAccess.Properties.Settings.Default.Version}", "No update");
         }
         #endregion
 
@@ -562,11 +606,5 @@ namespace Stamper.UI.Windows
             SpecialControl._vm.RotationAngle = _vm.RotationAngle.ToString();
         }
         #endregion
-
-        private async void MenuItemCheckForUpdate_OnClick(object sender, RoutedEventArgs e)
-        {
-            var updateAvailable = await CheckIfUpdateAvailable(true);
-            if(!updateAvailable) MessageBox.Show(this, $"No update is available.\nCurrent version: {DataAccess.Properties.Settings.Default.Version}", "No update");
-        }
     }
 }

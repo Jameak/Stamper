@@ -40,7 +40,7 @@ namespace Stamper.UI.ViewModels
             var emptyLayer = layers.FirstOrDefault(i => i.Type == Layer.LayerType.Border && i.Name == "None");
             if (emptyLayer != null) Borders.Add(new BorderInfo
             {
-                Image = BitmapHelper.ConvertBitmapToImageSource(LayerHelper.LoadBitmapFromFile(emptyLayer.File, previewResolution, 5)),
+                Image = BitmapHelper.ConvertBitmapToImageSource(ImageLoader.LoadBitmapFromFile(emptyLayer.File, previewResolution, 5)),
                 Info = emptyLayer
             });
 
@@ -48,7 +48,7 @@ namespace Stamper.UI.ViewModels
             {
                 Borders.Add(new BorderInfo
                 {
-                    Image = BitmapHelper.ConvertBitmapToImageSource(LayerHelper.LoadBitmapFromFile(layer.File, previewResolution, previewResolution)),
+                    Image = BitmapHelper.ConvertBitmapToImageSource(ImageLoader.LoadBitmapFromFile(layer.File, previewResolution, previewResolution)),
                     Info = layer
                 });
             }

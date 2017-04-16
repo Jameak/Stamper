@@ -32,7 +32,7 @@ namespace Stamper.UI
         /// </summary>
         public static Bitmap ConvertToPixelFormat_32bppArgb(Bitmap image)
         {
-            return LayerHelper.ConvertBitmapToPixelFormat_32bppArgb(image);
+            return ImageLoader.ConvertBitmapToPixelFormat_32bppArgb(image);
         }
 
         /// <summary>

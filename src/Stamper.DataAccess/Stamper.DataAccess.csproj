@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ImageLoader.cs" />
     <Compile Include="Imgur.cs" />
     <Compile Include="Layer.cs" />
     <Compile Include="LayerHelper.cs" />

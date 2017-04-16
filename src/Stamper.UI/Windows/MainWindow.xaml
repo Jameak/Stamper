@@ -37,16 +37,16 @@
                 <MenuItem Header="_Auto-Update Preview Window" IsCheckable="True" IsChecked="{Binding AutoUpdatePreview}"/>
             </MenuItem>
             <MenuItem Header="_Size">
-                <MenuItem Header="_256 x 256" IsChecked="{Binding ImageResolution, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_SizeConverter}, ConverterParameter=256}" Command="{Binding UpdateResolution}" CommandParameter="256"/>
-                <MenuItem Header="_512 x 512" IsChecked="{Binding ImageResolution, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_SizeConverter}, ConverterParameter=512}" Command="{Binding UpdateResolution}" CommandParameter="512"/>
-                <MenuItem Header="_1024 x 1024" IsChecked="{Binding ImageResolution, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_SizeConverter}, ConverterParameter=1024}" Command="{Binding UpdateResolution}" CommandParameter="1024"/>
+                <MenuItem Header="_256 x 256" Command="{Binding UpdateResolution}" CommandParameter="256"/>
+                <MenuItem Header="_512 x 512" Command="{Binding UpdateResolution}" CommandParameter="512"/>
+                <MenuItem Header="_1024 x 1024" Command="{Binding UpdateResolution}" CommandParameter="1024"/>
                 <MenuItem Header="_Custom Size" Click="MenuItemCustomSize_OnClick"/>
                 <Separator/>
                 <MenuItem Header="_Virtual Tabletop">
-                    <MenuItem Header="_Roll20 (70 x 70)" IsChecked="{Binding ImageResolution, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_SizeConverter}, ConverterParameter=70}" Command="{Binding UpdateResolution}" CommandParameter="70"/>
-                    <MenuItem Header="_Roll20, 2 by 2 (140 x 140)" IsChecked="{Binding ImageResolution, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_SizeConverter}, ConverterParameter=140}" Command="{Binding UpdateResolution}" CommandParameter="140"/>
-                    <MenuItem Header="_Fantasy Grounds (50 x 50)" IsChecked="{Binding ImageResolution, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_SizeConverter}, ConverterParameter=50}" Command="{Binding UpdateResolution}" CommandParameter="50"/>
-                    <MenuItem Header="_Fantasy Grounds (64 x 64)" IsChecked="{Binding ImageResolution, Mode=TwoWay, Converter={x:Static converters:Converters.Checkbox_SizeConverter}, ConverterParameter=64}" Command="{Binding UpdateResolution}" CommandParameter="64"/>
+                    <MenuItem Header="_Roll20 (70 x 70)" Command="{Binding UpdateResolution}" CommandParameter="70"/>
+                    <MenuItem Header="_Roll20, 2 by 2 (140 x 140)" Command="{Binding UpdateResolution}" CommandParameter="140"/>
+                    <MenuItem Header="_Fantasy Grounds (50 x 50)" Command="{Binding UpdateResolution}" CommandParameter="50"/>
+                    <MenuItem Header="_Fantasy Grounds (64 x 64)" Command="{Binding UpdateResolution}" CommandParameter="64"/>
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="_Help">
@@ -77,10 +77,10 @@
 
                 </controls:CustomZoomBorder>
                 <StackPanel Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
-                    <Image x:Name="OverlayImage" Stretch="None"/>
+                    <Image x:Name="OverlayImage" Stretch="None" Source="{Binding OverlayImage}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
-                    <Image x:Name="BorderImage" Stretch="None"/>
+                    <Image x:Name="BorderImage" Stretch="None" Source="{Binding BorderImage}"/>
                 </StackPanel>
                 <controls:ZoomBorder_NotHitTestable Grid.Column="0" Grid.Row="0" x:Name="ZoomControl_Text" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding ShowText}" Rotation="ZoomControl_Text_OnRotation" MouseRightButtonUp="ZoomControl_OnMouseRightButtonUp" MouseWheel="ZoomControl_OnMouseWheel">
                     <Border>
@@ -93,7 +93,7 @@
                     </Border>
                 </controls:ZoomBorder_NotHitTestable>
 
-                <StackPanel Grid.Column="0" Grid.Row="0" x:Name="RenderLocation" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" Height="{Binding ImageResolution}" Width="{Binding ImageResolution}"/>
+                <StackPanel Grid.Column="0" Grid.Row="0" x:Name="RenderLocation" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" Height="{Binding ImageResolutionHeight}" Width="{Binding ImageResolutionWidth}"/>
 
 
                 <!--Right-hand side controls-->

@@ -83,7 +83,6 @@
       <DependentUpon>SpecialControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ZoomBorder_NotHitTestable.cs" />
-    <Compile Include="Converters\Checkbox_SizeConverter.cs" />
     <Compile Include="Converters\Checkbox_ZoomConverter.cs" />
     <Compile Include="Converters\Converters.cs" />
     <Compile Include="Events\ButtonZoomEvent.cs" />

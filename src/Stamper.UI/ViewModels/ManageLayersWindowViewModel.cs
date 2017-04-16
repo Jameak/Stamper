@@ -30,7 +30,7 @@ namespace Stamper.UI.ViewModels
             {
                 Layers.Add(new LayerEntry
                 {
-                    Image = BitmapHelper.ConvertBitmapToImageSource(LayerHelper.LoadBitmapFromFile(layer.File, previewResolution, previewResolution)),
+                    Image = BitmapHelper.ConvertBitmapToImageSource(ImageLoader.LoadBitmapFromFile(layer.File, previewResolution, previewResolution)),
                     Info = layer
                 });
             }

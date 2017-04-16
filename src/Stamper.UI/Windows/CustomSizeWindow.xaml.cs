@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Stamper.DataAccess;
 using Stamper.UI.ViewModels;
 
 namespace Stamper.UI.Windows
@@ -19,9 +20,21 @@ namespace Stamper.UI.Windows
     {
         public bool OkClicked = false;
 
-        public CustomSizeWindow()
+        public CustomSizeWindow(ImageLoader.FitMode currentFit)
         {
             InitializeComponent();
+
+            switch (currentFit)
+            {
+                case ImageLoader.FitMode.Fill:
+                    Fill.IsChecked = true;
+                    break;
+                case ImageLoader.FitMode.Stretch:
+                    Stretch.IsChecked = true;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(currentFit), currentFit, null);
+            }
         }
 
         private void InputValidation(object sender, TextCompositionEventArgs e)
