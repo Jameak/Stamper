@@ -403,14 +403,25 @@ namespace Stamper.UI.Windows
         {
             var image = RenderImage();
 
+            var filename = DataAccess.Properties.Settings.Default.LastFilename;
+            filename = string.IsNullOrWhiteSpace(filename) ? DataAccess.Properties.Settings.Default.DefaultFilename : filename;
             var dialog = new Microsoft.Win32.SaveFileDialog
             {
                 Title = "Choose save location",
-                FileName = "token",
+                FileName = filename,
                 DefaultExt = ".png",
                 AddExtension = true,
                 Filter = "All Files|*.*"
             };
+
+            //Manually handle storing information about the last directory so that we can determine if a file with the name already exists.
+            var lastSaveDirectory = DataAccess.Properties.Settings.Default.LastSaveDirectory;
+            if (!string.IsNullOrWhiteSpace(lastSaveDirectory) && Directory.Exists(lastSaveDirectory))
+            {
+                dialog.InitialDirectory = lastSaveDirectory;
+                var uniqueFilename = Filenamer.UniqueFilename(lastSaveDirectory, filename, dialog.DefaultExt);
+                dialog.FileName = uniqueFilename;
+            }
 
             var result = dialog.ShowDialog();
 
@@ -418,6 +429,19 @@ namespace Stamper.UI.Windows
             {
                 if (!dialog.FileName.EndsWith(".png")) dialog.FileName = dialog.FileName + ".png";
                 image.Save(dialog.FileName, ImageFormat.Png);
+
+                //Save the filename for next time the user saves something, stripping (1), (2), etc. incase the user uses the unique suggested name and the original suggestion already existed.
+                var actualfilename = Path.GetFileNameWithoutExtension(dialog.FileName);
+                var filenameregex = new Regex(@"^(?<name>.*)\([1-9]*\) *$");
+                var match = filenameregex.Match(actualfilename);
+                if (match.Success)
+                {
+                    actualfilename = match.Groups["name"].Value.Trim();
+                }
+                
+                DataAccess.Properties.Settings.Default.LastFilename = actualfilename;
+                DataAccess.Properties.Settings.Default.LastSaveDirectory = Path.GetDirectoryName(dialog.FileName);
+                DataAccess.Properties.Settings.Default.Save();
             }
         }
 

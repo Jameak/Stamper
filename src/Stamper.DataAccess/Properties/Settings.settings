@@ -14,5 +14,14 @@
     <Setting Name="GitHubUserAgent" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Stamper</Value>
     </Setting>
+    <Setting Name="LastSaveDirectory" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LastFilename" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DefaultFilename" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">token</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

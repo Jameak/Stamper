@@ -64,5 +64,38 @@ namespace Stamper.DataAccess.Properties {
                 return ((string)(this["GitHubUserAgent"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastSaveDirectory {
+            get {
+                return ((string)(this["LastSaveDirectory"]));
+            }
+            set {
+                this["LastSaveDirectory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastFilename {
+            get {
+                return ((string)(this["LastFilename"]));
+            }
+            set {
+                this["LastFilename"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("token")]
+        public string DefaultFilename {
+            get {
+                return ((string)(this["DefaultFilename"]));
+            }
+        }
     }
 }
