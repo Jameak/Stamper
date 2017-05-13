@@ -1,3 +1,7 @@
+## 1.2.0 - 2017-05-13
+* Add support for custom, rectangular resolutions. When choosing custom resolution, you can now specify whether the chosen border and overlay should be stretched to the resolution or keep its aspect ratio.
+* When saving tokens, the save-dialog will open the last-used directory and suggest the same filename.
+
 ## 1.1.0 - 2017-03-18
 * Added layer management window
 * Improved the layer adding window. Local files can now be dropped into the textbox, and it is clearer that a layer mask can be left out.
