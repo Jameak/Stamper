@@ -96,6 +96,11 @@ namespace Stamper.UI.Windows
             _timer = new DispatcherTimer();
             _timer.Tick += TimerTicked;
             _timer.Interval = TimeSpan.FromMilliseconds(200);
+            
+            //Load settings-values
+            _vm.UpdateResolution.Execute(new Tuple<int, int, ImageLoader.FitMode>(SettingsManager.StartupTokenWidth, SettingsManager.StartupTokenHeight, SettingsManager.StartupFitmode));
+            _vm.AutoUpdatePreview = SettingsManager.StartupAutoUpdatePreview;
+
 
             CheckIfUpdateAvailable(false);
         }
@@ -403,8 +408,8 @@ namespace Stamper.UI.Windows
         {
             var image = RenderImage();
 
-            var filename = DataAccess.Properties.Settings.Default.LastFilename;
-            filename = string.IsNullOrWhiteSpace(filename) ? DataAccess.Properties.Settings.Default.DefaultFilename : filename;
+            var filename = SettingsManager.LastFilename;
+            filename = string.IsNullOrWhiteSpace(filename) ? SettingsManager.DefaultFilename : filename;
             var dialog = new Microsoft.Win32.SaveFileDialog
             {
                 Title = "Choose save location",
@@ -415,7 +420,7 @@ namespace Stamper.UI.Windows
             };
 
             //Manually handle storing information about the last directory so that we can determine if a file with the name already exists.
-            var lastSaveDirectory = DataAccess.Properties.Settings.Default.LastSaveDirectory;
+            var lastSaveDirectory = SettingsManager.LastSaveDirectory;
             if (!string.IsNullOrWhiteSpace(lastSaveDirectory) && Directory.Exists(lastSaveDirectory))
             {
                 dialog.InitialDirectory = lastSaveDirectory;
@@ -438,10 +443,9 @@ namespace Stamper.UI.Windows
                 {
                     actualfilename = match.Groups["name"].Value.Trim();
                 }
-                
-                DataAccess.Properties.Settings.Default.LastFilename = actualfilename;
-                DataAccess.Properties.Settings.Default.LastSaveDirectory = Path.GetDirectoryName(dialog.FileName);
-                DataAccess.Properties.Settings.Default.Save();
+
+                SettingsManager.LastFilename = actualfilename;
+                SettingsManager.LastSaveDirectory = Path.GetDirectoryName(dialog.FileName);
             }
         }
 
@@ -556,7 +560,7 @@ namespace Stamper.UI.Windows
         private async void MenuItemCheckForUpdate_OnClick(object sender, RoutedEventArgs e)
         {
             var updateAvailable = await CheckIfUpdateAvailable(true);
-            if (!updateAvailable) MessageBox.Show(this, $"No update is available.\nCurrent version: {DataAccess.Properties.Settings.Default.Version}", "No update");
+            if (!updateAvailable) MessageBox.Show(this, $"No update is available.\nCurrent version: {SettingsManager.Version}", "No update");
         }
         #endregion
 
@@ -630,5 +634,16 @@ namespace Stamper.UI.Windows
             SpecialControl._vm.RotationAngle = _vm.RotationAngle.ToString();
         }
         #endregion
+
+        private void MenuItemSettings_OnClick(object sender, RoutedEventArgs e)
+        {
+            var window = new SettingsWindow
+            {
+                Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            };
+
+            window.Show();
+        }
     }
 }

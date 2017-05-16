@@ -23,5 +23,17 @@
     <Setting Name="DefaultFilename" Type="System.String" Scope="Application">
       <Value Profile="(Default)">token</Value>
     </Setting>
+    <Setting Name="StartupTokenWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">512</Value>
+    </Setting>
+    <Setting Name="StartupTokenHeight" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">512</Value>
+    </Setting>
+    <Setting Name="StartupFitmode" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="StartupAutoUpdatePreview" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

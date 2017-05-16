@@ -22,7 +22,7 @@ namespace Stamper.DataAccess
         static Imgur()
         {
             Client = new HttpClient();
-            Client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Client-ID {Properties.Settings.Default.ImgurClientID}");
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Client-ID {SettingsManager.ImgurClientID}");
         }
         
         /// <summary>

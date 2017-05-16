@@ -16,22 +16,22 @@ namespace Stamper.UI.ViewModels
 {
     public class MainWindowViewModel : BaseViewModel
     {
-        private const int STARTUP_RESOLUTION = 512;
+        private const int DEFAULT_STARTUP_RESOLUTION = 512;
         public ImageLoader.FitMode FitMode { get; private set; } = ImageLoader.FitMode.Stretch;
 
         //The resolution that the user wants the output image to be.
-        public int DesiredResolutionWidth { get; private set; } = STARTUP_RESOLUTION;
-        public int DesiredResolutionHeight { get; private set; } = STARTUP_RESOLUTION;
+        public int DesiredResolutionWidth { get; private set; } = DEFAULT_STARTUP_RESOLUTION;
+        public int DesiredResolutionHeight { get; private set; } = DEFAULT_STARTUP_RESOLUTION;
 
         //The resolution of the currently chosen border or overlay.
-        public int ActualResolutionWidth { get; private set; } = STARTUP_RESOLUTION;
-        public int ActualResolutionHeight { get; private set; } = STARTUP_RESOLUTION;
+        public int ActualResolutionWidth { get; private set; } = DEFAULT_STARTUP_RESOLUTION;
+        public int ActualResolutionHeight { get; private set; } = DEFAULT_STARTUP_RESOLUTION;
 
         //The resolution given to the border and overlays after adhering to the chosen FitMode. Will be equal to DesiredResolutionWidth/Height if the FitMode is set to Stretch
-        private int _imageResolutionWidth = STARTUP_RESOLUTION;
+        private int _imageResolutionWidth = DEFAULT_STARTUP_RESOLUTION;
         public int ImageResolutionWidth { get { return _imageResolutionWidth; } private set { if (_imageResolutionWidth != value) { _imageResolutionWidth = value; OnPropertyChanged(); } } }
 
-        private int _imageResolutionHeight = STARTUP_RESOLUTION;
+        private int _imageResolutionHeight = DEFAULT_STARTUP_RESOLUTION;
         public int ImageResolutionHeight { get { return _imageResolutionHeight; } private set { if (_imageResolutionHeight != value) { _imageResolutionHeight = value; OnPropertyChanged(); } } }
         
         private BitmapImage _image;

@@ -97,5 +97,53 @@ namespace Stamper.DataAccess.Properties {
                 return ((string)(this["DefaultFilename"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("512")]
+        public int StartupTokenWidth {
+            get {
+                return ((int)(this["StartupTokenWidth"]));
+            }
+            set {
+                this["StartupTokenWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("512")]
+        public int StartupTokenHeight {
+            get {
+                return ((int)(this["StartupTokenHeight"]));
+            }
+            set {
+                this["StartupTokenHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int StartupFitmode {
+            get {
+                return ((int)(this["StartupFitmode"]));
+            }
+            set {
+                this["StartupFitmode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool StartupAutoUpdatePreview {
+            get {
+                return ((bool)(this["StartupAutoUpdatePreview"]));
+            }
+            set {
+                this["StartupAutoUpdatePreview"] = value;
+            }
+        }
     }
 }

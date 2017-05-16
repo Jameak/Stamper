@@ -22,6 +22,7 @@
                 <MenuItem Header="_Upload to Imgur" Click="MenuItemImgur_OnClick" x:Name="MenuImgur"/>
                 <Separator/>
                 <MenuItem Header="_Manage layers" Click="MenuItemManageLayers_OnClick"/>
+                <MenuItem Header="_Settings" Click="MenuItemSettings_OnClick"/>
             </MenuItem>
             <MenuItem Header="_View">
                 <MenuItem Header="_Zoom Speed">

@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Stamper.DataAccess;
 
 namespace Stamper.UI.Windows
 {
@@ -20,7 +21,7 @@ namespace Stamper.UI.Windows
         {
             InitializeComponent();
 
-            CurrentVersion.Text = $"Current version: {DataAccess.Properties.Settings.Default.Version}";
+            CurrentVersion.Text = $"Current version: {SettingsManager.Version}";
             AvailabeVersion.Text = $"Available version: {newVersion}";
         }
 
@@ -31,8 +32,7 @@ namespace Stamper.UI.Windows
 
         private void DontNotifyButton_OnClick(object sender, RoutedEventArgs e)
         {
-            DataAccess.Properties.Settings.Default.IgnoreUpdates = true;
-            DataAccess.Properties.Settings.Default.Save();
+            SettingsManager.IgnoreUpdates = true;
             Close();
         }
 

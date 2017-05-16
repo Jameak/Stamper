@@ -16,7 +16,7 @@ namespace Stamper.DataAccess
         static UpdateChecker()
         {
             Client = new HttpClient();
-            Client.DefaultRequestHeaders.Add("User-Agent", Properties.Settings.Default.GitHubUserAgent);
+            Client.DefaultRequestHeaders.Add("User-Agent", SettingsManager.GithubUserAgent);
             Client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
         }
 
@@ -31,7 +31,7 @@ namespace Stamper.DataAccess
         /// </returns>
         public static async Task<Tuple<bool, string>> CheckForUpdate(bool forceCheck)
         {
-            if (Properties.Settings.Default.IgnoreUpdates && !forceCheck) return new Tuple<bool, string>(false, string.Empty);
+            if (SettingsManager.IgnoreUpdates && !forceCheck) return new Tuple<bool, string>(false, string.Empty);
 
             HttpResponseMessage result;
             try
@@ -48,7 +48,7 @@ namespace Stamper.DataAccess
                 var val = await result.Content.ReadAsStringAsync();
                 var response = JsonConvert.DeserializeObject<List<GithubRelease>>(val);
                 
-                var currentVersion = ParseVersion(Properties.Settings.Default.Version);
+                var currentVersion = ParseVersion(SettingsManager.Version);
                 foreach (var githubRelease in response)
                 {
                     if (!githubRelease.Draft && !githubRelease.Prerelease)

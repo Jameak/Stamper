@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Stamper.DataAccess;
 
 namespace Stamper.UI.Windows
 {
@@ -21,7 +22,7 @@ namespace Stamper.UI.Windows
         public AboutWindow()
         {
             InitializeComponent();
-            VersionField.Text = DataAccess.Properties.Settings.Default.Version;
+            VersionField.Text = SettingsManager.Version;
         }
 
         private void Hyperlink_OnRequestNavigate(object sender, RequestNavigateEventArgs e)

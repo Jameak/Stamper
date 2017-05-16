@@ -83,7 +83,7 @@
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Text rotation:" VerticalAlignment="Center" Margin="0,0,8,0"/>
             <TextBox Grid.Row="1" Grid.Column="1" x:Name="TextAngle" PreviewTextInput="InputValidation_Text" DataObject.Pasting="InputValidationOnPaste" Text="{Binding TextRotationAngle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" KeyUp="TextBox_OnKeyUp"/>
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="Used Font:" Margin="0,0,8,0" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Text font:" Margin="0,0,8,0" VerticalAlignment="Center"/>
             <ComboBox Grid.Row="2" Grid.Column="1" x:Name="FontBox" ItemsSource="{Binding Source={StaticResource SortedFonts}}" SelectedIndex="0" SelectionChanged="FontBox_OnSelectionChanged"/>
 
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Text color:" Margin="0,0,8,0" VerticalAlignment="Center"/>

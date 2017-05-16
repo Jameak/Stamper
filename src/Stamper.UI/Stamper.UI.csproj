@@ -125,6 +125,9 @@
     <Compile Include="Windows\RatelimitWindow.xaml.cs">
       <DependentUpon>RatelimitWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\UpdateAvailableWindow.xaml.cs">
       <DependentUpon>UpdateAvailableWindow.xaml</DependentUpon>
     </Compile>
@@ -202,6 +205,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\RatelimitWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
