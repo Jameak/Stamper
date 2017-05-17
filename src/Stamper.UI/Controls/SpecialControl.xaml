@@ -57,6 +57,11 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+            <Rectangle Grid.Column="0" Grid.Row="0">
+                <Rectangle.Fill>
+                    <ImageBrush TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute" ImageSource="/Stamper.DataAccess;component/Resources/TransparencyTile.bmp"/>
+                </Rectangle.Fill>
+            </Rectangle>
             <Border Grid.Row="0" Grid.Column="0" Background="{Binding BackdropColorBrush}" BorderBrush="Black" BorderThickness="1"/>
             <Button Grid.Row="0" Grid.Column="1" Content="Color Picker" Command="{Binding BackdropColorPickCommand}"/>
         </Grid>
@@ -95,6 +100,11 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
+                <Rectangle Grid.Column="0" Grid.Row="0">
+                    <Rectangle.Fill>
+                        <ImageBrush TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute" ImageSource="/Stamper.DataAccess;component/Resources/TransparencyTile.bmp"/>
+                    </Rectangle.Fill>
+                </Rectangle>
                 <Border Grid.Row="0" Grid.Column="0" Background="{Binding ColorBrush}" BorderBrush="Black" BorderThickness="1"/>
                 <Button Grid.Row="0" Grid.Column="1" Content="Color Picker" Command="{Binding ColorPickCommand}"/>
             </Grid>

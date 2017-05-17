@@ -5,7 +5,7 @@ using System.Windows.Interop;
 
 namespace Stamper.UI
 {
-    public class PInvokeHelper
+    public static class PInvokeHelper
     {
         [DllImport("user32.dll")]
         private static extern int GetWindowLong(IntPtr hWnd, int nIndex);

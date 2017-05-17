@@ -173,6 +173,7 @@
     <Content Include="layers\svg\_None.svg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\TransparencyTile.bmp" />
     <None Include="Resources\LayerPreviewImage.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

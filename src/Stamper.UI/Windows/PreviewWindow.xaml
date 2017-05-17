@@ -5,6 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Stamper Preview" Height="720" Width="1280">
+    <Window.Background>
+        <ImageBrush TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute" ImageSource="/Stamper.DataAccess;component/Resources/TransparencyTile.bmp"/>
+    </Window.Background>
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
         <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
             <Image Width="{Binding ImageWidth}" Height="{Binding ImageHeight}" Source="{Binding BitmapImage}"/>

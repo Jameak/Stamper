@@ -51,6 +51,12 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Column="0" Grid.Row="0" Text="Tint-mode:" VerticalAlignment="Center"/>
             <ComboBox Grid.Column="1" Grid.Row="0" x:Name="FilterBox" ItemsSource="{Binding TintChoices}" SelectionChanged="FilterBox_OnSelectionChanged" SelectedIndex="0"/>
+
+            <Rectangle Grid.Column="0" Grid.Row="1">
+                <Rectangle.Fill>
+                    <ImageBrush TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute" ImageSource="/Stamper.DataAccess;component/Resources/TransparencyTile.bmp"/>
+                </Rectangle.Fill>
+            </Rectangle>
             <Border Grid.Column="0" Grid.Row="1" Background="{Binding ColorBrush}" BorderBrush="Black" BorderThickness="1"/>
             <Button Grid.Column="1" Grid.Row="1" Content="Open Color Picker" Command="{Binding ColorPickCommand}"/>
         </Grid>

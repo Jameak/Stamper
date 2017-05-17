@@ -66,6 +66,11 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*" />
                 </Grid.RowDefinitions>
+                <Rectangle Grid.Column="0" Grid.Row="0">
+                    <Rectangle.Fill>
+                        <ImageBrush TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute" ImageSource="/Stamper.DataAccess;component/Resources/TransparencyTile.bmp"/>
+                    </Rectangle.Fill>
+                </Rectangle>
                 <controls:CustomZoomBorder  x:Name="ZoomControl" Grid.Column="0" Grid.Row="0" AllowDrop="True" Drop="ZoomControl_OnDrop" MouseRightButtonUp="ZoomControl_OnMouseRightButtonUp" MouseWheel="ZoomControl_OnMouseWheel" Rotation="ZoomControl_OnRotation" Background="{Binding BackdropColor}">
                     <Border>
                         <Border RenderTransformOrigin="0.5,0.5">
