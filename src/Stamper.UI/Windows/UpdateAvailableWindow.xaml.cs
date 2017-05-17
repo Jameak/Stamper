@@ -20,6 +20,8 @@ namespace Stamper.UI.Windows
         public UpdateAvailableWindow(string newVersion)
         {
             InitializeComponent();
+            PInvokeHelper.DisableMinimizeButton(this);
+            PInvokeHelper.DisableMaximizeButton(this);
 
             CurrentVersion.Text = $"Current version: {SettingsManager.Version}";
             AvailabeVersion.Text = $"Available version: {newVersion}";

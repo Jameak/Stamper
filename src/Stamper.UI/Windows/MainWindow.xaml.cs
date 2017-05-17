@@ -562,6 +562,17 @@ namespace Stamper.UI.Windows
             var updateAvailable = await CheckIfUpdateAvailable(true);
             if (!updateAvailable) MessageBox.Show(this, $"No update is available.\nCurrent version: {SettingsManager.Version}", "No update");
         }
+
+        private void MenuItemSettings_OnClick(object sender, RoutedEventArgs e)
+        {
+            var window = new SettingsWindow
+            {
+                Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            };
+
+            window.Show();
+        }
         #endregion
 
         #region ZoomBorder
@@ -634,16 +645,5 @@ namespace Stamper.UI.Windows
             SpecialControl._vm.RotationAngle = _vm.RotationAngle.ToString();
         }
         #endregion
-
-        private void MenuItemSettings_OnClick(object sender, RoutedEventArgs e)
-        {
-            var window = new SettingsWindow
-            {
-                Owner = this,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner
-            };
-
-            window.Show();
-        }
     }
 }

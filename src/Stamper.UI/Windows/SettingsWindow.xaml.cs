@@ -21,6 +21,8 @@ namespace Stamper.UI.Windows
         public SettingsWindow()
         {
             InitializeComponent();
+            PInvokeHelper.DisableMinimizeButton(this);
+            PInvokeHelper.DisableMaximizeButton(this);
 
             LoadSettings();
         }

@@ -23,6 +23,8 @@ namespace Stamper.UI.Windows
         public CustomSizeWindow(ImageLoader.FitMode currentFit)
         {
             InitializeComponent();
+            PInvokeHelper.DisableMinimizeButton(this);
+            PInvokeHelper.DisableMaximizeButton(this);
 
             switch (currentFit)
             {

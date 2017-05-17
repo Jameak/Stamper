@@ -89,6 +89,7 @@
     <Compile Include="Events\RotationEvent.cs" />
     <Compile Include="Filters\Filters.cs" />
     <Compile Include="BitmapHelper.cs" />
+    <Compile Include="PInvokeHelper.cs" />
     <Compile Include="ViewModels\AddLayerViewModel.cs" />
     <Compile Include="ViewModels\Base\BaseViewModel.cs" />
     <Compile Include="ViewModels\Base\RelayCommand.cs" />

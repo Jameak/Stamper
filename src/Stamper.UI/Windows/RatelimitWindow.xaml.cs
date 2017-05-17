@@ -23,6 +23,9 @@ namespace Stamper.UI.Windows
         public RatelimitWindow()
         {
             InitializeComponent();
+            PInvokeHelper.DisableMinimizeButton(this);
+            PInvokeHelper.DisableMaximizeButton(this);
+
             _vm = new RatelimitWindowViewModel();
             DataContext = _vm;
 

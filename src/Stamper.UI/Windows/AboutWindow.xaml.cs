@@ -22,6 +22,9 @@ namespace Stamper.UI.Windows
         public AboutWindow()
         {
             InitializeComponent();
+            PInvokeHelper.DisableMinimizeButton(this);
+            PInvokeHelper.DisableMaximizeButton(this);
+
             VersionField.Text = SettingsManager.Version;
         }
 

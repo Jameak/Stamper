@@ -22,6 +22,8 @@ namespace Stamper.UI.Windows
         public UploadingWindow()
         {
             InitializeComponent();
+            PInvokeHelper.DisableMinimizeButton(this);
+            PInvokeHelper.DisableMaximizeButton(this);
         }
     }
 }
