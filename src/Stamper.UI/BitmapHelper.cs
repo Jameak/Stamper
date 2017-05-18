@@ -141,17 +141,17 @@ namespace Stamper.UI
         /// Image must use the 32bppArgb pixel format.
         /// </summary>
         /// <remarks>Results will differ between big- and little-endian architectures.</remarks>
-        public static void AddFilter(Bitmap image, Color tint, FilterMethods.TintFilterDelegate tintFilter)
+        public static void AddFilter(Bitmap image, Color tint, FilterMethods.BlendFilterDelegate blendFilter)
         {
-            //Dont waste time trying to tint if the given color is completely transparent
+            //Dont waste time trying to tint if the given color is completely transparent and the selected filter does blending that is dependent on the selected tint colour.
             if (tint.A == Colors.Transparent.A && tint.R == Colors.Transparent.R && tint.G == Colors.Transparent.G &&
-                tint.B == Colors.Transparent.B)
+                tint.B == Colors.Transparent.B && !FilterMethods.IgnoresBlendColor.Contains(blendFilter))
             {
                 return;
             }
 
             //Dont waste time if we're not going to do anything anyway.
-            if (tintFilter == FilterMethods.None) return;
+            if (blendFilter == FilterMethods.None) return;
 
 
             var rect = new Rectangle(0, 0, image.Width, image.Height);
@@ -171,7 +171,7 @@ namespace Stamper.UI
                     var G = imagebuffer[offset + 1];
                     var R = imagebuffer[offset + 2];
                     var A = imagebuffer[offset + 3];
-                    var result = tintFilter(R, G, B, A, tint.R, tint.B, tint.G, tint.A);
+                    var result = blendFilter(R, G, B, A, tint.R, tint.B, tint.G, tint.A);
 
                     imagebuffer[offset + 0] = (byte)result.Item3;
                     imagebuffer[offset + 1] = (byte)result.Item2;
@@ -183,48 +183,7 @@ namespace Stamper.UI
             Marshal.Copy(imagebuffer, 0, imagedata.Scan0, imagebuffer.Length);
             image.UnlockBits(imagedata);
         }
-
-        /// <summary>
-        /// Applies the specified filter to the image.
-        /// 
-        /// Image must use the 32bppArgb pixel format.
-        /// </summary>
-        /// <remarks>Results will differ between big- and little-endian architectures.</remarks>
-        public static void AddFilter(Bitmap image, FilterMethods.SpecialFilterDelegate specialFilter)
-        {
-            //Dont waste time if we're not going to do anything anyway.
-            if (specialFilter == FilterMethods.None) return;
-
-            var rect = new Rectangle(0, 0, image.Width, image.Height);
-
-            var imagedata = image.LockBits(rect, ImageLockMode.ReadWrite, image.PixelFormat);
-            var imagedepth = Image.GetPixelFormatSize(imagedata.PixelFormat) / 8;
-            var imagebuffer = new byte[imagedata.Width * imagedata.Height * imagedepth];
-            Marshal.Copy(imagedata.Scan0, imagebuffer, 0, imagebuffer.Length);
-
-            Parallel.For(0, imagedata.Width, x =>
-            {
-                for (int y = 0; y < imagedata.Height; y++)
-                {
-                    var offset = (y * imagedata.Width + x) * imagedepth;
-                    //The 32bppArgb format lies to us in regards to the order of channels because of endian-ness. On little-endian architecture the byte-order is BGRA instead of ARGB...
-                    var B = imagebuffer[offset + 0];
-                    var G = imagebuffer[offset + 1];
-                    var R = imagebuffer[offset + 2];
-                    var A = imagebuffer[offset + 3];
-                    var result = specialFilter(R, G, B, A);
-
-                    imagebuffer[offset + 0] = (byte)result.Item3;
-                    imagebuffer[offset + 1] = (byte)result.Item2;
-                    imagebuffer[offset + 2] = (byte)result.Item1;
-                    imagebuffer[offset + 3] = (byte)result.Item4;
-                }
-            });
-            
-            Marshal.Copy(imagebuffer, 0, imagedata.Scan0, imagebuffer.Length);
-            image.UnlockBits(imagedata);
-        }
-
+        
         public static async Task<Bitmap> LoadBitmapAsync(string path)
         {
             return ConvertToPixelFormat_32bppArgb(await Task.Factory.StartNew(() =>

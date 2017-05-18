@@ -52,6 +52,17 @@ namespace Stamper.UI.Controls
                 }
             });
 
+            _vm.SpecialFilterColorPickCommand = new RelayCommand(o =>
+            {
+                Color color;
+                bool ok = ColorPickerWindow.ShowDialog(out color);
+                if (ok)
+                {
+                    _vm.SpecialFilterColor = color;
+                    RaiseEvent(new RoutedEventArgs(SpecialFilterColorChangedEvent));
+                }
+            });
+
             _vm.PropertyChanged += (sender, args) =>
             {
                 if (args.PropertyName == nameof(_vm.RotationAngle)) RaiseEvent(new RoutedEventArgs(RotationChangedEvent));
@@ -172,6 +183,17 @@ namespace Stamper.UI.Controls
         {
             add { AddHandler(BackdropColorChangedEvent, value); }
             remove { RemoveHandler(BackdropColorChangedEvent, value); }
+        }
+
+
+        public static readonly RoutedEvent SpecialFilterColorChangedEvent =
+            EventManager.RegisterRoutedEvent(nameof(SpecialFilterColorChangedEvent), RoutingStrategy.Bubble,
+                                             typeof(RoutedEventHandler), typeof(SpecialControl));
+
+        public event RoutedEventHandler SpecialFilterColorChanged
+        {
+            add { AddHandler(SpecialFilterColorChangedEvent, value); }
+            remove { RemoveHandler(SpecialFilterColorChangedEvent, value); }
         }
         #endregion
     }

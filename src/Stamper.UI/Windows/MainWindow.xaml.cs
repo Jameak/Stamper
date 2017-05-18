@@ -35,9 +35,9 @@ namespace Stamper.UI.Windows
         private OverlayControlViewModel.OverlayInfo _overlayInfo;
         private Color _overlayTintColor = Color.FromArgb(0, 255, 255, 255); //Default to transparent
         private Color _borderTintColor = Color.FromArgb(0, 255, 255, 255); //Default to transparent
-        private FilterMethods.TintFilterDelegate _overlayTintFilter = FilterMethods.Normal;
-        private FilterMethods.TintFilterDelegate _borderTintFilter = FilterMethods.Normal;
-        private FilterMethods.SpecialFilterDelegate _specialFilter = FilterMethods.None;
+        private FilterMethods.BlendFilterDelegate _overlayBlendFilter = FilterMethods.Normal;
+        private FilterMethods.BlendFilterDelegate _borderBlendFilter = FilterMethods.Normal;
+        private FilterMethods.BlendFilterDelegate _specialFilter = FilterMethods.None;
         private readonly DispatcherTimer _timer;
 
         public MainWindow()
@@ -189,13 +189,13 @@ namespace Stamper.UI.Windows
             Bitmap bitmap = RenderVisual(ZoomControl);
 
             //Apply the special filter.
-            BitmapHelper.AddFilter(bitmap, _specialFilter);
+            BitmapHelper.AddFilter(bitmap, _vm.SpecialFilterColor, _specialFilter);
 
             // Modify the rendered image.
             if (_overlayInfo != null)
             {
                 var overlay = ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
-                BitmapHelper.AddFilter(overlay, _overlayTintColor, _overlayTintFilter);
+                BitmapHelper.AddFilter(overlay, _overlayTintColor, _overlayBlendFilter);
                 if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlay, ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight));
                 BitmapHelper.AddLayerToImage(bitmap, overlay);
             }
@@ -204,7 +204,7 @@ namespace Stamper.UI.Windows
             {
                 if (!string.IsNullOrWhiteSpace(_borderInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(bitmap, ImageLoader.LoadBitmapFromFile(_borderInfo.Info.Mask, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight));
                 var border = ImageLoader.LoadBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
-                BitmapHelper.AddFilter(border, _borderTintColor, _borderTintFilter);
+                BitmapHelper.AddFilter(border, _borderTintColor, _borderBlendFilter);
                 BitmapHelper.AddLayerToImage(bitmap, border);  //Draw the border
             }
 
@@ -242,7 +242,7 @@ namespace Stamper.UI.Windows
             {
                 //Border
                 var borderImage = ImageLoader.LoadBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
-                BitmapHelper.AddFilter(borderImage, _borderTintColor, _borderTintFilter);
+                BitmapHelper.AddFilter(borderImage, _borderTintColor, _borderBlendFilter);
 
                 _vm.BorderImage = BitmapHelper.ConvertBitmapToImageSource(borderImage);
                 BorderImage.Height = _vm.ImageResolutionHeight;
@@ -253,7 +253,7 @@ namespace Stamper.UI.Windows
             {
                 //Overlay
                 var overlayImage = ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
-                BitmapHelper.AddFilter(overlayImage, _overlayTintColor, _overlayTintFilter);
+                BitmapHelper.AddFilter(overlayImage, _overlayTintColor, _overlayBlendFilter);
                 if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlayImage, ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight));
 
                 _vm.OverlayImage = BitmapHelper.ConvertBitmapToImageSource(overlayImage);
@@ -285,7 +285,7 @@ namespace Stamper.UI.Windows
         {
             var bc = sender as BorderControl;
             var filter = bc.FilterBox.SelectedItem as TintFilter;
-            _borderTintFilter = filter.Method;
+            _borderBlendFilter = filter.Method;
             UpdateOverlays();
         }
 
@@ -293,7 +293,7 @@ namespace Stamper.UI.Windows
         {
             var oc = sender as OverlayControl;
             var filter = oc.FilterBox.SelectedItem as TintFilter;
-            _overlayTintFilter = filter.Method;
+            _overlayBlendFilter = filter.Method;
             UpdateOverlays();
         }
 
@@ -386,6 +386,14 @@ namespace Stamper.UI.Windows
         private void SpecialControl_OnBackdropColorChanged(object sender, RoutedEventArgs e)
         {
             _vm.BackdropColor = new SolidColorBrush((sender as SpecialControl)._vm.BackdropColor);
+
+            if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
+        }
+
+        private void SpecialControl_OnSpecialFilterColorChanged(object sender, RoutedEventArgs e)
+        {
+            var color = (sender as SpecialControl)._vm.SpecialFilterColor;
+            _vm.SpecialFilterColor = Color.FromArgb(color.A, color.R, color.G, color.B);
 
             if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
         }

@@ -113,7 +113,7 @@
                         <controls:OverlayControl x:Name="Overlays" OverlaySelected="OverlayControl_OnOverlaySelected" TintSelected="OverlayControl_OnTintSelected" TintFilterSelected="OverlayControl_OnTintFilterSelected"/>
                     </TabItem>
                     <TabItem Header="Special">
-                        <controls:SpecialControl x:Name="SpecialControl" FilterSelected="SpecialControl_OnFilterSelected" RotationChanged="SpecialControl_OnRotationChanged" TextManipulationChanged="SpecialControl_OnTextManipulationChanged" ButtonZoom="SpecialControl_OnButtonZoom" BackdropColorChanged="SpecialControl_OnBackdropColorChanged"/>
+                        <controls:SpecialControl x:Name="SpecialControl" FilterSelected="SpecialControl_OnFilterSelected" RotationChanged="SpecialControl_OnRotationChanged" TextManipulationChanged="SpecialControl_OnTextManipulationChanged" ButtonZoom="SpecialControl_OnButtonZoom" BackdropColorChanged="SpecialControl_OnBackdropColorChanged" SpecialFilterColorChanged="SpecialControl_OnSpecialFilterColorChanged"/>
                     </TabItem>
                 </TabControl>
             </Grid>

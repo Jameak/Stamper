@@ -11,11 +11,11 @@ namespace Stamper.UI.Filters
     {
         Normal, Multiply, Screen, Divide, Add, Difference, Subtract, Darken, Lighten, None, Sepia, Grayscale, Overlay
     }
-
+    
     public class TintFilter
     {
         public Filters Name { get; set; }
-        public FilterMethods.TintFilterDelegate Method { get; set; }
+        public FilterMethods.BlendFilterDelegate Method { get; set; }
 
         public override string ToString()
         {
@@ -26,7 +26,7 @@ namespace Stamper.UI.Filters
     public class SpecialFilter
     {
         public Filters Name { get; set; }
-        public FilterMethods.SpecialFilterDelegate Method { get; set; }
+        public FilterMethods.BlendFilterDelegate Method { get; set; }
 
         public override string ToString()
         {
@@ -36,6 +36,19 @@ namespace Stamper.UI.Filters
 
     public static class FilterMethods
     {
+        /// <summary>
+        /// List of blends that should be applied to the underlying image even if the tint-colour is transparent.
+        /// </summary>
+        public static ICollection<BlendFilterDelegate> IgnoresBlendColor => new List<BlendFilterDelegate>
+        {
+            Sepia,
+            Grayscale
+        };
+
+        /// <summary>
+        /// List of filters that should be shown in the dropdown-menu for overlay tint-selections.
+        /// The order of this list desides the order of the filters in the dropdown-menu.
+        /// </summary>
         public static ICollection<TintFilter> TintFilters => new List<TintFilter>
         {
             new TintFilter {Name = Filters.Normal, Method = Normal},
@@ -51,11 +64,24 @@ namespace Stamper.UI.Filters
             new TintFilter {Name = Filters.None, Method = None}
         };
 
+        /// <summary>
+        /// List of filters that should be shown in the dropdown-menu for special filters.
+        /// The order of this list desides the order of the filters in the dropdown-menu.
+        /// </summary>
         public static ICollection<SpecialFilter> SpecialFilters => new List<SpecialFilter>
         {
             new SpecialFilter {Name = Filters.None, Method = None},
             new SpecialFilter {Name = Filters.Sepia, Method = Sepia},
-            new SpecialFilter {Name = Filters.Grayscale, Method = Grayscale}
+            new SpecialFilter {Name = Filters.Grayscale, Method = Grayscale},
+            new SpecialFilter {Name = Filters.Multiply, Method = Multiply},
+            new SpecialFilter {Name = Filters.Screen, Method = Screen},
+            new SpecialFilter {Name = Filters.Divide, Method = Divide},
+            new SpecialFilter {Name = Filters.Add, Method = Add},
+            new SpecialFilter {Name = Filters.Difference, Method = Difference},
+            new SpecialFilter {Name = Filters.Subtract, Method = Subtract},
+            new SpecialFilter {Name = Filters.Darken, Method = Darken},
+            new SpecialFilter {Name = Filters.Lighten, Method = Lighten},
+            new SpecialFilter {Name = Filters.Overlay, Method = Overlay}
         };
 
         /// <summary>
@@ -76,23 +102,7 @@ namespace Stamper.UI.Filters
         /// Item 3 is the green-component of the resulting color.
         /// Item 4 is the alpha-component of the resulting color.
         /// </returns>
-        public delegate Tuple<int,int,int,int> TintFilterDelegate(int or, int ob, int og, int oa, int tr, int tb, int tg, int ta);
-
-        /// <summary>
-        /// A delegate used for changing the colors of an image using a specific pre-determined filter.
-        /// </summary>
-        /// <param name="r">The red-component of the pixel to tint.</param>
-        /// <param name="b">The blue-component of the pixel to tint.</param>
-        /// <param name="g">The green-component of the pixel to tint.</param>
-        /// <param name="a">The alpha-component of the pixel to tint.</param>
-        /// <returns>
-        /// A tuple where:
-        /// Item 1 is the red-component of the resulting color.
-        /// Item 2 is the blue-component of the resulting color.
-        /// Item 3 is the green-component of the resulting color.
-        /// Item 4 is the alpha-component of the resulting color.
-        /// </returns>
-        public delegate Tuple<int,int,int,int> SpecialFilterDelegate(int r, int b, int g, int a);
+        public delegate Tuple<int,int,int,int> BlendFilterDelegate(int or, int ob, int og, int oa, int tr, int tb, int tg, int ta);
         
         public static Tuple<int, int, int, int> None(int r, int b, int g, int a)
         {
@@ -183,7 +193,8 @@ namespace Stamper.UI.Filters
             return new Tuple<int, int, int, int>(R, G, B, oa);
         }
 
-        public static Tuple<int, int, int, int> Sepia(int r, int b, int g, int a)
+        // Doesn't use the given tint-values.
+        public static Tuple<int, int, int, int> Sepia(int r, int b, int g, int a, int tr, int tb, int tg, int ta)
         {
             int R = Math.Min(255, (int) ((r * 0.393) + (b * 0.189) + (g * 0.769)));
             int G = Math.Min(255, (int) ((r * 0.349) + (b * 0.168) + (g * 0.686)));
@@ -191,7 +202,8 @@ namespace Stamper.UI.Filters
             return new Tuple<int, int, int, int>(R, G, B, a);
         }
 
-        public static Tuple<int, int, int, int> Grayscale(int r, int b, int g, int a)
+        // Doesn't use the given tint-values.
+        public static Tuple<int, int, int, int> Grayscale(int r, int b, int g, int a, int tr, int tb, int tg, int ta)
         {
             int gray = (int)(r * 0.299 + g * 0.587 + b * 0.114);
             return new Tuple<int, int, int, int>(gray, gray, gray, a);

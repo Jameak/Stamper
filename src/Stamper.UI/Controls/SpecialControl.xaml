@@ -28,16 +28,35 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="The special image filter is only visible in the dedicated preview-window and the output." TextWrapping="Wrap" Margin="0,0,0,8"/>
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Special image filter: " TextWrapping="Wrap" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Special image filter:" VerticalAlignment="Center"/>
         <ComboBox Grid.Row="1" Grid.Column="1" x:Name="SpecialFilterBox" ItemsSource="{Binding SpecialFilters}" SelectionChanged="FilterBox_OnSelectionChanged" SelectedIndex="0"/>
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Image rotation angle:"/>
-        <TextBox Grid.Row="2" Grid.Column="1" x:Name="AngleBox" PreviewTextInput="InputValidation" DataObject.Pasting="InputValidationOnPaste" Text="{Binding RotationAngle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" KeyUp="AngleBox_OnKeyUp"/>
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="Manual zoom:"/>
-        <Grid Grid.Row="3" Grid.Column="1">
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Filter colour: " VerticalAlignment="Center"/>
+        <Grid Grid.Row="2" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Rectangle Grid.Column="0" Grid.Row="0">
+                <Rectangle.Fill>
+                    <ImageBrush TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute" ImageSource="/Stamper.DataAccess;component/Resources/TransparencyTile.bmp"/>
+                </Rectangle.Fill>
+            </Rectangle>
+            <Border Grid.Row="0" Grid.Column="0" Background="{Binding SpecialFilterColorBrush}" BorderBrush="Black" BorderThickness="1"/>
+            <Button Grid.Row="0" Grid.Column="1" Content="Color Picker" Command="{Binding SpecialFilterColorPickCommand}"/>
+        </Grid>
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Image rotation angle:"/>
+        <TextBox Grid.Row="3" Grid.Column="1" x:Name="AngleBox" PreviewTextInput="InputValidation" DataObject.Pasting="InputValidationOnPaste" Text="{Binding RotationAngle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" KeyUp="AngleBox_OnKeyUp"/>
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Manual zoom:" VerticalAlignment="Center"/>
+        <Grid Grid.Row="4" Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="1*" />
@@ -48,8 +67,8 @@
             <Button Grid.Column="0" Grid.Row="0" Content="Zoom In" Margin="0,0,1,0" Command="{Binding ManualZoomImage}" CommandParameter="1"/>
             <Button Grid.Column="1" Grid.Row="0" Content="Zoom Out" Margin="1,0,0,0" Command="{Binding ManualZoomImage}" CommandParameter="-1"/>
         </Grid>
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="Backdrop color:" Margin="0,0,8,0" VerticalAlignment="Center"/>
-        <Grid Grid.Row="4" Grid.Column="1">
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="Backdrop color:" Margin="0,0,8,0" VerticalAlignment="Center"/>
+        <Grid Grid.Row="5" Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="Auto" />
@@ -66,10 +85,10 @@
             <Button Grid.Row="0" Grid.Column="1" Content="Color Picker" Command="{Binding BackdropColorPickCommand}"/>
         </Grid>
 
-        <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Text="Text controls:" Margin="0,10,0,0" FontWeight="SemiBold"/>
-        <CheckBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Content="Show text control border" IsChecked="{Binding TextManipulationShowBorder}"/>
-        <CheckBox Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Content="Show text" IsChecked="{Binding TextManipulationShowText}"/>
-        <Grid Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2">
+        <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Text="Text controls:" Margin="0,10,0,0" FontWeight="SemiBold"/>
+        <CheckBox Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Content="Show text control border" IsChecked="{Binding TextManipulationShowBorder}"/>
+        <CheckBox Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Content="Show text" IsChecked="{Binding TextManipulationShowText}"/>
+        <Grid Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="1*" />

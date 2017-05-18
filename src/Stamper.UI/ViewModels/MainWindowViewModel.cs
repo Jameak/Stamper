@@ -83,6 +83,10 @@ namespace Stamper.UI.ViewModels
 
         private SolidColorBrush _backdropColor = new SolidColorBrush(Colors.Transparent);
         public SolidColorBrush BackdropColor { get { return _backdropColor; } set { if (_backdropColor != value) { _backdropColor = value; OnPropertyChanged(); } } }
+
+        private System.Drawing.Color _specialFilterColor = System.Drawing.Color.Transparent;
+        public System.Drawing.Color SpecialFilterColor { get { return _specialFilterColor; } set { if (_specialFilterColor != value) { _specialFilterColor = value; OnPropertyChanged(); } } }
+
         
         public ICommand SaveToken { get; set; }
         public ICommand LoadToken { get; set; }

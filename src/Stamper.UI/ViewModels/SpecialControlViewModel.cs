@@ -33,9 +33,14 @@ namespace Stamper.UI.ViewModels
         public Color BackdropColor { get { return _backdropColor; } set { if (_backdropColor != value) { _backdropColor = value; OnPropertyChanged(); OnPropertyChanged(nameof(BackdropColorBrush)); } } }
         public SolidColorBrush BackdropColorBrush => new SolidColorBrush(_backdropColor);
 
+        private Color _specialFilterColor = Colors.Transparent;
+        public Color SpecialFilterColor { get { return _specialFilterColor; } set { if (_specialFilterColor != value) { _specialFilterColor = value; OnPropertyChanged(); OnPropertyChanged(nameof(SpecialFilterColorBrush)); } } }
+        public SolidColorBrush SpecialFilterColorBrush => new SolidColorBrush(_specialFilterColor);
+
         public ICommand FireRotationProperty { get; private set; }
         public ICommand ColorPickCommand { get; set; }
         public ICommand BackdropColorPickCommand { get; set; }
+        public ICommand SpecialFilterColorPickCommand { get; set; }
         public ICommand ManualZoomImage { get; set; }
         public ICommand ManualZoomText { get; set; }
 
