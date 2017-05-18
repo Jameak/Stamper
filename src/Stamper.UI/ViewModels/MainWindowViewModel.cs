@@ -46,6 +46,9 @@ namespace Stamper.UI.ViewModels
         private bool _autoUpdatePreview;
         public bool AutoUpdatePreview { get { return _autoUpdatePreview; } set { if (_autoUpdatePreview != value) { _autoUpdatePreview = value; OnPropertyChanged(); } } }
 
+        private bool _autocrop;
+        public bool Autocrop { get { return _autocrop; } set { if (_autocrop != value) { _autocrop = value; OnPropertyChanged(); } } }
+
         private string _zoomSpeed = "1.2";
         public string ZoomSpeed { get { return _zoomSpeed; } set { _zoomSpeed = value; OnPropertyChanged(); } } //ZoomSpeed on the ZoomBorder isn't a DependencyObject, so it cant have a binding.
 

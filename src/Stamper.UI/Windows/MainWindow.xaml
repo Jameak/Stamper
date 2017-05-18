@@ -36,6 +36,7 @@
                 <MenuItem Header="_Update Preview" Command="{Binding UpdatePreview}"/>
                 <Separator/>
                 <MenuItem Header="_Auto-Update Preview Window" IsCheckable="True" IsChecked="{Binding AutoUpdatePreview}"/>
+                <MenuItem Header="_Autocrop output" IsCheckable="True" IsChecked="{Binding Autocrop}" ToolTip="Remove empty borders from the output token"/>
             </MenuItem>
             <MenuItem Header="_Size">
                 <MenuItem Header="_256 x 256" Command="{Binding UpdateResolution}" CommandParameter="256"/>

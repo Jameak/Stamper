@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using Stamper.DataAccess;
 using Stamper.UI.Filters;
 using Color = System.Drawing.Color;
+using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
 namespace Stamper.UI
 {
@@ -266,6 +267,129 @@ namespace Stamper.UI
         }
 
         /// <summary>
+        /// Removes empty borders from the given image.
+        /// </summary>
+        public static Bitmap Autocrop(Bitmap image)
+        {
+            var rect = new Rectangle(0, 0, image.Width, image.Height);
+
+            var imagedata = image.LockBits(rect, ImageLockMode.ReadOnly, image.PixelFormat);
+            var imagedepth = Image.GetPixelFormatSize(imagedata.PixelFormat) / 8;
+            var imagebuffer = new byte[imagedata.Width * imagedata.Height * imagedepth];
+            Marshal.Copy(imagedata.Scan0, imagebuffer, 0, imagebuffer.Length);
+            image.UnlockBits(imagedata);
+
+            int minX = -1;
+            int minY = -1;
+            int maxX = -1;
+            int maxY = -1; 
+
+            Parallel.Invoke(() =>
+            {
+                //Find minX
+                for (int x = 0; x < imagedata.Width; x++)
+                {
+                    for (int y = 0; y < imagedata.Height; y++)
+                    {
+                        var offset = (y * imagedata.Width + x) * imagedepth;
+
+                        //Check if the pixel is not completely transparent.
+                        if (imagebuffer[offset + 3] != 0)
+                        {
+                            minX = x;
+
+                            //Break out of both loops
+                            x = imagedata.Width;
+                            y = imagedata.Height;
+                        }
+                    }
+                }
+            }, () =>
+            {
+                //Find minY
+                for (int y = 0; y < imagedata.Height; y++)
+                {
+                    for (int x = 0; x < imagedata.Width; x++)
+                    {
+                        var offset = (y * imagedata.Width + x) * imagedepth;
+
+                        //Check if the pixel is not completely transparent.
+                        if (imagebuffer[offset + 3] != 0)
+                        {
+                            minY = y;
+
+                            //Break out of both loops
+                            x = imagedata.Width;
+                            y = imagedata.Height;
+                        }
+                    }
+                }
+            }, () =>
+            {
+                //Find maxX
+                for (int x = imagedata.Width - 1; x >= 0; x--)
+                {
+                    for (int y = imagedata.Height - 1; y >= 0; y--)
+                    {
+                        var offset = (y * imagedata.Width + x) * imagedepth;
+
+                        //Check if the pixel is not completely transparent.
+                        if (imagebuffer[offset + 3] != 0)
+                        {
+                            maxX = x;
+
+                            //Break out of both loops
+                            x = -1;
+                            y = -1;
+                        }
+                    }
+                }
+            }, () =>
+            {
+                //Find maxY
+                for (int y = imagedata.Height - 1; y >= 0; y--)
+                {
+                    for (int x = imagedata.Width - 1; x >= 0; x--)
+                    {
+                        var offset = (y * imagedata.Width + x) * imagedepth;
+
+                        //Check if the pixel is not completely transparent.
+                        if (imagebuffer[offset + 3] != 0)
+                        {
+                            maxY = y;
+
+                            //Break out of both loops
+                            x = -1;
+                            y = -1;
+                        }
+                    }
+                }
+            });
+            
+            //Completely transparent image or something went wrong. Just return the input.
+            if (minX == -1 || minY == -1 || maxX == -1 || maxY == -1)
+            {
+                return image;
+            }
+
+            int width = maxX - minX + 1;
+            int height = maxY - minY + 1;
+            
+            if (width <= 0 || height <= 0)
+            {
+                return image;
+            }
+
+            var crop = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+            using (var g = Graphics.FromImage(crop))
+            {
+                g.DrawImage(image, -minX, -minY);
+            }
+
+            return crop;
+        }
+
+        /// <summary>
         /// Generates a mask from the given image.
         /// This is a best-effort attempt that will probably be worse than a well-made custom mask.
         /// 
@@ -413,7 +537,7 @@ namespace Stamper.UI
                 return X >= 0 && Y >= 0 && X < imageWidth && Y < imageHeight;
             }
 
-            // Needed because coords are stored in a ConcurrentDictionary which uses hashing.
+            // Needed because coords are stored in a ConcurrentDictionary.
             public override bool Equals(object obj)
             {
                 if (!(obj is Coordinate)) return false;
@@ -422,7 +546,7 @@ namespace Stamper.UI
                 return coord.X == X && coord.Y == Y;
             }
 
-            // Needed because coords are stored in a ConcurrentDictionary which uses hashing.
+            // Needed because coords are stored in a ConcurrentDictionary.
             public override int GetHashCode()
             {
                 return X * 100000 + Y;

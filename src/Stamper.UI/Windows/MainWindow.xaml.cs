@@ -214,8 +214,13 @@ namespace Stamper.UI.Windows
                 BitmapHelper.AddLayerToImage(bitmap, text);
             }
 
+            if (_vm.Autocrop)
+            {
+                bitmap = BitmapHelper.Autocrop(bitmap);
+            }
+            
             //Since we just spent time rendering the image, we might as well update the preview even if the user didn't ask for that specifically.
-            _preWindow?.SetImage(bitmap, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
+            _preWindow?.SetImage(bitmap);
             return bitmap;
         }
 

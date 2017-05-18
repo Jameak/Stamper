@@ -30,12 +30,12 @@ namespace Stamper.UI.Windows
             DataContext = _vm;
         }
 
-        public void SetImage(Bitmap image, int width, int height)
+        public void SetImage(Bitmap image)
         {
             var bitmap = BitmapHelper.ConvertBitmapToImageSource(image);
             _vm.BitmapImage = bitmap;
-            _vm.ImageWidth = width;
-            _vm.ImageHeight = height;
+            _vm.ImageWidth = image.Width;
+            _vm.ImageHeight = image.Height;
         }
     }
 }
