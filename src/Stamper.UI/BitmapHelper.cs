@@ -27,7 +27,7 @@ namespace Stamper.UI
         /// The color in the mask-image that will be removed from images that masks are applied to.
         /// </summary>
         private static Color _maskColor = Color.FromArgb(255, 0, 255, 0);
-
+        
         /// <summary>
         /// <see cref="LayerHelper.ConvertBitmapToPixelFormat_32bppArgb(Bitmap)"/>
         /// </summary>
@@ -109,19 +109,6 @@ namespace Stamper.UI
             Marshal.Copy(imagebuffer, 0, imagedata.Scan0, imagebuffer.Length);
             image.UnlockBits(imagedata);
             mask.UnlockBits(maskdata);
-
-            //The above code is equal to this, but much much faster.
-            //for (var x = 0; x < mask.Width; x++)
-            //{
-            //    for (var y = 0; y < mask.Height; y++)
-            //    {
-            //        var pixel = mask.GetPixel(x, y);
-            //        if (pixel.R == 0 && pixel.G == 255 && pixel.B == 0 && pixel.A == 255) //If the pixel is #00FF00, we should make the pixel in the output transparent.
-            //        {
-            //            image.SetPixel(x, y, Color.Transparent);
-            //        }
-            //    }
-            //}
         }
 
         /// <summary>
@@ -152,10 +139,10 @@ namespace Stamper.UI
 
             //Dont waste time if we're not going to do anything anyway.
             if (blendFilter == FilterMethods.None) return;
-
+            
 
             var rect = new Rectangle(0, 0, image.Width, image.Height);
-
+            
             var imagedata = image.LockBits(rect, ImageLockMode.ReadWrite, image.PixelFormat);
             var imagedepth = Image.GetPixelFormatSize(imagedata.PixelFormat) / 8;
             var imagebuffer = new byte[imagedata.Width * imagedata.Height * imagedepth];
@@ -171,7 +158,7 @@ namespace Stamper.UI
                     var G = imagebuffer[offset + 1];
                     var R = imagebuffer[offset + 2];
                     var A = imagebuffer[offset + 3];
-                    var result = blendFilter(R, G, B, A, tint.R, tint.B, tint.G, tint.A);
+                    var result = blendFilter(R, G, B, A, tint.R, tint.G, tint.B, tint.A);
 
                     imagebuffer[offset + 0] = (byte)result.Item3;
                     imagebuffer[offset + 1] = (byte)result.Item2;
@@ -367,7 +354,7 @@ namespace Stamper.UI
         /// <remarks>Results will differ between big- and little-endian architectures.</remarks>
         public static Bitmap GenerateMask(Bitmap image)
         {
-            var mask = new Bitmap(image.Width, image.Height);
+            var mask = new Bitmap(image.Width, image.Height, PixelFormat.Format32bppArgb);
             var queue = new ConcurrentQueue<Coordinate>();
             var set = new ConcurrentDictionary<Coordinate, bool>(); //We only need a set, but C# doesn't have a concurrent implementation
 

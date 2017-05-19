@@ -87,6 +87,7 @@
     <Compile Include="Converters\Converters.cs" />
     <Compile Include="Events\ButtonZoomEvent.cs" />
     <Compile Include="Events\RotationEvent.cs" />
+    <Compile Include="Filters\FilterMethods.cs" />
     <Compile Include="Filters\Filters.cs" />
     <Compile Include="BitmapHelper.cs" />
     <Compile Include="PInvokeHelper.cs" />
