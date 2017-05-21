@@ -46,6 +46,9 @@ namespace Stamper.UI.ViewModels
         private bool _autoUpdatePreview;
         public bool AutoUpdatePreview { get { return _autoUpdatePreview; } set { if (_autoUpdatePreview != value) { _autoUpdatePreview = value; OnPropertyChanged(); } } }
 
+        private bool _keepPreviewOnTop;
+        public bool KeepPreviewOnTop { get { return _keepPreviewOnTop; } set { if (_keepPreviewOnTop != value) { _keepPreviewOnTop = value; OnPropertyChanged(); } } }
+
         private bool _autocrop;
         public bool Autocrop { get { return _autocrop; } set { if (_autocrop != value) { _autocrop = value; OnPropertyChanged(); } } }
 

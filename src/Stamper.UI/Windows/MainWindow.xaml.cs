@@ -88,6 +88,8 @@ namespace Stamper.UI.Windows
             {
                 //When a new image is loaded, update the preview
                 if(args.PropertyName == nameof(_vm.Image) && _vm.AutoUpdatePreview) RenderUsingDispatcher();
+
+                if(args.PropertyName == nameof(_vm.KeepPreviewOnTop)) if(_preWindow != null) _preWindow.Topmost = _vm.KeepPreviewOnTop;
             };
 
             _vm.Image = BitmapHelper.ConvertBitmapToImageSource(DataAccess.Properties.Resources.Splash);
@@ -145,6 +147,7 @@ namespace Stamper.UI.Windows
                 _vm.UpdatePreview.OnCanExecuteChanged(sender);
             };
             _preWindow.Show();
+            _preWindow.Topmost = _vm.KeepPreviewOnTop;
 
             _vm.OpenPreviewWindow.OnCanExecuteChanged(sender);
             _vm.UpdatePreview.OnCanExecuteChanged(sender);
