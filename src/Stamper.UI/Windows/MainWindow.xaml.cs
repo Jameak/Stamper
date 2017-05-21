@@ -278,8 +278,7 @@ namespace Stamper.UI.Windows
 
         private void BorderControl_OnTintSelected(object sender, RoutedEventArgs e)
         {
-            var bc = sender as BorderControl;
-            var color = bc.SelectedColor;
+            var color = ((ColorSelectedEvent) e).Color;
             _borderTintColor = System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
             UpdateOverlays();
         }
@@ -310,8 +309,7 @@ namespace Stamper.UI.Windows
 
         private void OverlayControl_OnTintSelected(object sender, RoutedEventArgs e)
         {
-            var oc = sender as OverlayControl;
-            var color = oc.SelectedColor;
+            var color = ((ColorSelectedEvent)e).Color;
             _overlayTintColor = System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
             UpdateOverlays();
         }
@@ -336,10 +334,15 @@ namespace Stamper.UI.Windows
 
         private void SpecialControl_OnTextManipulationChanged(object sender, RoutedEventArgs e)
         {
+            if (e is ColorSelectedEvent)
+            {
+                _vm.TextColor = new SolidColorBrush(((ColorSelectedEvent)e).Color);
+                return;
+            }
+
             _vm.ShowTextBorder = (sender as SpecialControl)._vm.TextManipulationShowBorder;
             _vm.ShowText = (sender as SpecialControl)._vm.TextManipulationShowText ? Visibility.Visible : Visibility.Collapsed;
             _vm.TextFont = (sender as SpecialControl).FontBox.SelectedItem as System.Windows.Media.FontFamily;
-            _vm.TextColor = new SolidColorBrush((sender as SpecialControl)._vm.TextColor);
 
             //Convert \n to an actual newline
             var text = (sender as SpecialControl)._vm.TextContent.ToCharArray();
@@ -388,14 +391,14 @@ namespace Stamper.UI.Windows
 
         private void SpecialControl_OnBackdropColorChanged(object sender, RoutedEventArgs e)
         {
-            _vm.BackdropColor = new SolidColorBrush((sender as SpecialControl)._vm.BackdropColor);
+            _vm.BackdropColor = new SolidColorBrush(((ColorSelectedEvent)e).Color);
 
             if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
         }
 
         private void SpecialControl_OnSpecialFilterColorChanged(object sender, RoutedEventArgs e)
         {
-            var color = (sender as SpecialControl)._vm.SpecialFilterColor;
+            var color = ((ColorSelectedEvent)e).Color;
             _vm.SpecialFilterColor = Color.FromArgb(color.A, color.R, color.G, color.B);
 
             if (_vm.AutoUpdatePreview) RenderUsingDispatcher();

@@ -82,6 +82,7 @@
     <Compile Include="Converters\Checkbox_ZoomConverter.cs" />
     <Compile Include="Converters\Converters.cs" />
     <Compile Include="Events\ButtonZoomEvent.cs" />
+    <Compile Include="Events\ColorSelectedEvent.cs" />
     <Compile Include="Events\RotationEvent.cs" />
     <Compile Include="Filters\FilterMethods.cs" />
     <Compile Include="Filters\Filters.cs" />

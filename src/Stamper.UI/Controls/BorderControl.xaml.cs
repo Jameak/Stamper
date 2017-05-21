@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ColorPickerWPF;
+using ColorPickerWPF.Code;
+using Stamper.UI.Events;
 using Stamper.UI.ViewModels;
 using Stamper.UI.ViewModels.Base;
 
@@ -21,7 +23,6 @@ namespace Stamper.UI.Controls
     public partial class BorderControl : UserControl
     {
         private BorderControlViewModel _vm;
-        public Color SelectedColor => _vm.SelectColor;
 
         public BorderControl()
         {
@@ -32,13 +33,18 @@ namespace Stamper.UI.Controls
 
             _vm.ColorPickCommand = new RelayCommand(o =>
             {
+                ColorPickerControl.ColorPickerChangeHandler previewHandler =
+                    selectedColor => RaiseEvent(new ColorSelectedEvent(TintSelectedEvent, selectedColor));
+
                 Color color;
-                bool ok = ColorPickerWindow.ShowDialog(out color);
+                bool ok = ColorPickerWindow.ShowDialog(out color, ColorPickerDialogOptions.None, null, _vm.SelectColor, previewHandler);
+
                 if (ok)
                 {
                     _vm.SelectColor = color;
-                    RaiseEvent(new RoutedEventArgs(TintSelectedEvent));
                 }
+
+                RaiseEvent(new ColorSelectedEvent(TintSelectedEvent, _vm.SelectColor));
             });
         }
 

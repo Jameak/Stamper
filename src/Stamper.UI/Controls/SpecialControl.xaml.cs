@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ColorPickerWPF;
+using ColorPickerWPF.Code;
 using Stamper.UI.Events;
 using Stamper.UI.ViewModels;
 using Stamper.UI.ViewModels.Base;
@@ -32,35 +33,50 @@ namespace Stamper.UI.Controls
 
             _vm.ColorPickCommand = new RelayCommand(o =>
             {
+                ColorPickerControl.ColorPickerChangeHandler previewHandler =
+                    selectedColor => RaiseEvent(new ColorSelectedEvent(TextManipulationChangedEvent, selectedColor));
+
                 Color color;
-                bool ok = ColorPickerWindow.ShowDialog(out color);
+                bool ok = ColorPickerWindow.ShowDialog(out color, ColorPickerDialogOptions.None, null, _vm.TextColor, previewHandler);
+
                 if (ok)
                 {
                     _vm.TextColor = color;
-                    RaiseEvent(new RoutedEventArgs(TextManipulationChangedEvent));
                 }
+
+                RaiseEvent(new ColorSelectedEvent(TextManipulationChangedEvent, _vm.TextColor));
             });
 
             _vm.BackdropColorPickCommand = new RelayCommand(o =>
             {
+                ColorPickerControl.ColorPickerChangeHandler previewHandler =
+                    selectedColor => RaiseEvent(new ColorSelectedEvent(BackdropColorChangedEvent, selectedColor));
+
                 Color color;
-                bool ok = ColorPickerWindow.ShowDialog(out color);
+                bool ok = ColorPickerWindow.ShowDialog(out color, ColorPickerDialogOptions.None, null, _vm.BackdropColor, previewHandler);
+
                 if (ok)
                 {
                     _vm.BackdropColor = color;
-                    RaiseEvent(new RoutedEventArgs(BackdropColorChangedEvent));
                 }
+
+                RaiseEvent(new ColorSelectedEvent(BackdropColorChangedEvent, _vm.BackdropColor));
             });
 
             _vm.SpecialFilterColorPickCommand = new RelayCommand(o =>
             {
+                ColorPickerControl.ColorPickerChangeHandler previewHandler =
+                    selectedColor => RaiseEvent(new ColorSelectedEvent(SpecialFilterColorChangedEvent, selectedColor));
+
                 Color color;
-                bool ok = ColorPickerWindow.ShowDialog(out color);
+                bool ok = ColorPickerWindow.ShowDialog(out color, ColorPickerDialogOptions.None, null, _vm.SpecialFilterColor, previewHandler);
+
                 if (ok)
                 {
                     _vm.SpecialFilterColor = color;
-                    RaiseEvent(new RoutedEventArgs(SpecialFilterColorChangedEvent));
                 }
+
+                RaiseEvent(new ColorSelectedEvent(SpecialFilterColorChangedEvent, _vm.SpecialFilterColor));
             });
 
             _vm.PropertyChanged += (sender, args) =>
