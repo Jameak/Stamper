@@ -4,13 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="About" Height="230" Width="260">
+        Title="About" Height="210" Width="260">
     <Grid Margin="8">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -42,23 +41,19 @@
             </Hyperlink>
         </TextBlock>
         <TextBlock Grid.Column="0" Grid.Row="6">
-            <Hyperlink NavigateUri="https://github.com/drogoganor/ColorPickerWPF" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_OnRequestNavigate">
-                ColorPickerWPF
-            </Hyperlink>
-        </TextBlock>
-        <TextBlock Grid.Column="0" Grid.Row="7">
             <Hyperlink NavigateUri="https://github.com/praeclarum/NGraphics" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_OnRequestNavigate">
                 NGraphics
             </Hyperlink>
         </TextBlock>
-        <TextBlock Grid.Column="0" Grid.Row="8">
-            <Hyperlink NavigateUri="https://github.com/teichgraf/WriteableBitmapEx/" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_OnRequestNavigate">
-                WritableBitmapEx
-            </Hyperlink>
-        </TextBlock>
-        <TextBlock Grid.Column="0" Grid.Row="9">
+        <TextBlock Grid.Column="0" Grid.Row="7">
             <Hyperlink NavigateUri="https://github.com/JamesNK/Newtonsoft.Json" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_OnRequestNavigate">
                 Json.NET
+            </Hyperlink>
+        </TextBlock>
+        <TextBlock Grid.Column="0" Grid.Row="8">
+            And a fork of
+            <Hyperlink NavigateUri="https://github.com/Jameak/ColorPickerWPF" TextDecorations="{x:Null}" RequestNavigate="Hyperlink_OnRequestNavigate">
+                ColorPickerWPF
             </Hyperlink>
         </TextBlock>
     </Grid>
