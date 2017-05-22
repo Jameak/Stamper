@@ -107,12 +107,22 @@ namespace Stamper.DataAccess
             }
         }
 
-        public static bool StartupAutoUpdatePreview
+        public static bool AutoUpdatePreview
         {
-            get { return Properties.Settings.Default.StartupAutoUpdatePreview; }
+            get { return Properties.Settings.Default.AutoUpdatePreview; }
             set
             {
-                Properties.Settings.Default.StartupAutoUpdatePreview = value;
+                Properties.Settings.Default.AutoUpdatePreview = value;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        public static bool LiveColorPreview
+        {
+            get { return Properties.Settings.Default.LiveColorPreview; }
+            set
+            {
+                Properties.Settings.Default.LiveColorPreview = value;
                 Properties.Settings.Default.Save();
             }
         }

@@ -72,10 +72,10 @@ namespace Stamper.UI.Windows
                 ZoomControl_Text.Reset();
                 SpecialControl._vm.RotationAngle = "0";
                 SpecialControl._vm.TextRotationAngle = "0";
-                if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
+                if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
             });
             _vm.OpenPreviewWindow = new RelayCommand(o => OpenPreviewWindow(null, null), o => _preWindow == null);
-            _vm.UpdatePreview = new RelayCommand(o => RenderUsingDispatcher(), o => _preWindow != null);
+            _vm.UpdatePreview = new RelayCommand(o => RenderUsingDispatcher(), o => _preWindow != null && !SettingsManager.AutoUpdatePreview);
             _vm.SaveToken = new RelayCommand(o => MenuItemSave_OnClick(null, null));
             _vm.LoadToken = new RelayCommand(o => MenuItemLoad_OnClick(null, null));
             _vm.UpdateZoomSpeed = new RelayCommand(o =>
@@ -87,7 +87,7 @@ namespace Stamper.UI.Windows
             _vm.PropertyChanged += (sender, args) =>
             {
                 //When a new image is loaded, update the preview
-                if(args.PropertyName == nameof(_vm.Image) && _vm.AutoUpdatePreview) RenderUsingDispatcher();
+                if(args.PropertyName == nameof(_vm.Image) && SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
 
                 if(args.PropertyName == nameof(_vm.KeepPreviewOnTop)) if(_preWindow != null) _preWindow.Topmost = _vm.KeepPreviewOnTop;
             };
@@ -101,7 +101,6 @@ namespace Stamper.UI.Windows
             
             //Load settings-values
             _vm.UpdateResolution.Execute(new Tuple<int, int, ImageLoader.FitMode>(SettingsManager.StartupTokenWidth, SettingsManager.StartupTokenHeight, SettingsManager.StartupFitmode));
-            _vm.AutoUpdatePreview = SettingsManager.StartupAutoUpdatePreview;
 
 
             CheckIfUpdateAvailable(false);
@@ -264,7 +263,7 @@ namespace Stamper.UI.Windows
                 OverlayImage.Width = _vm.ImageResolutionWidth;
             }
 
-            if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
+            if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
         }
 
         #region Layer Selection
@@ -329,7 +328,7 @@ namespace Stamper.UI.Windows
             {
                 _vm.RotationAngle = num;
             }
-            if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
+            if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
         }
 
         private void SpecialControl_OnTextManipulationChanged(object sender, RoutedEventArgs e)
@@ -368,7 +367,7 @@ namespace Stamper.UI.Windows
                 _vm.TextRotationAngle = num;
             }
 
-            if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
+            if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
         }
 
         private void SpecialControl_OnButtonZoom(object sender, RoutedEventArgs e)
@@ -386,14 +385,14 @@ namespace Stamper.UI.Windows
                     throw new ArgumentException();
             }
 
-            if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
+            if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
         }
 
         private void SpecialControl_OnBackdropColorChanged(object sender, RoutedEventArgs e)
         {
             _vm.BackdropColor = new SolidColorBrush(((ColorSelectedEvent)e).Color);
 
-            if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
+            if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
         }
 
         private void SpecialControl_OnSpecialFilterColorChanged(object sender, RoutedEventArgs e)
@@ -401,7 +400,7 @@ namespace Stamper.UI.Windows
             var color = ((ColorSelectedEvent)e).Color;
             _vm.SpecialFilterColor = Color.FromArgb(color.A, color.R, color.G, color.B);
 
-            if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
+            if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
         }
         #endregion
 
@@ -591,6 +590,7 @@ namespace Stamper.UI.Windows
             };
 
             window.Show();
+            window.Closed += (o, args) => _vm.UpdatePreview.OnCanExecuteChanged(null);
         }
         #endregion
 
@@ -631,12 +631,12 @@ namespace Stamper.UI.Windows
 
         private void ZoomControl_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (_vm.AutoUpdatePreview) RenderUsingDispatcher();
+            if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
         }
 
         private void ZoomControl_OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (_vm.AutoUpdatePreview)
+            if (SettingsManager.AutoUpdatePreview)
             {
                 _timer.Stop();
                 _timer.Start();

@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ColorPickerWPF;
 using ColorPickerWPF.Code;
+using Stamper.DataAccess;
 using Stamper.UI.Events;
 using Stamper.UI.ViewModels;
 using Stamper.UI.ViewModels.Base;
@@ -35,7 +36,9 @@ namespace Stamper.UI.Controls
                     selectedColor => RaiseEvent(new ColorSelectedEvent(TintSelectedEvent, selectedColor));
 
                 Color color;
-                bool ok = ColorPickerWindow.ShowDialog(out color, ColorPickerDialogOptions.None, null, _vm.SelectColor, previewHandler);
+                bool ok = SettingsManager.LiveColorPreview
+                    ? ColorPickerWindow.ShowDialog(out color, ColorPickerDialogOptions.None, null, _vm.SelectColor, previewHandler)
+                    : ColorPickerWindow.ShowDialog(out color, ColorPickerDialogOptions.None, null, _vm.SelectColor);
 
                 if (ok)
                 {
@@ -51,6 +54,7 @@ namespace Stamper.UI.Controls
         public void RefreshLayers()
         {
             _vm.LoadLayers();
+            if (_vm.Overlays.Count > 0) OverlayList.SelectedIndex = 0;
         }
 
         private void OverlaySelectionChanged(object sender, SelectionChangedEventArgs e)

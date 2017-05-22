@@ -136,13 +136,25 @@ namespace Stamper.DataAccess.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool StartupAutoUpdatePreview {
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoUpdatePreview {
             get {
-                return ((bool)(this["StartupAutoUpdatePreview"]));
+                return ((bool)(this["AutoUpdatePreview"]));
             }
             set {
-                this["StartupAutoUpdatePreview"] = value;
+                this["AutoUpdatePreview"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool LiveColorPreview {
+            get {
+                return ((bool)(this["LiveColorPreview"]));
+            }
+            set {
+                this["LiveColorPreview"] = value;
             }
         }
     }

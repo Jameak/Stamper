@@ -35,7 +35,6 @@
                 <MenuItem Header="_Open Preview Window" Command="{Binding OpenPreviewWindow}"/>
                 <MenuItem Header="_Update Preview" Command="{Binding UpdatePreview}"/>
                 <Separator/>
-                <MenuItem Header="_Auto-Update Preview Window" IsCheckable="True" IsChecked="{Binding AutoUpdatePreview}"/>
                 <MenuItem Header="_Keep Preview Window on top" IsCheckable="True" IsChecked="{Binding KeepPreviewOnTop}"/>
             </MenuItem>
             <MenuItem Header="_Size">

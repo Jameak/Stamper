@@ -42,9 +42,6 @@ namespace Stamper.UI.ViewModels
 
         private BitmapImage _overlayImage;
         public BitmapImage OverlayImage { get { return _overlayImage; } set { if (!Equals(_overlayImage, value)) { _overlayImage = value; OnPropertyChanged(); } } }
-        
-        private bool _autoUpdatePreview;
-        public bool AutoUpdatePreview { get { return _autoUpdatePreview; } set { if (_autoUpdatePreview != value) { _autoUpdatePreview = value; OnPropertyChanged(); } } }
 
         private bool _keepPreviewOnTop;
         public bool KeepPreviewOnTop { get { return _keepPreviewOnTop; } set { if (_keepPreviewOnTop != value) { _keepPreviewOnTop = value; OnPropertyChanged(); } } }

@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Stamper.UI.Windows"
         mc:Ignorable="d"
-        Title="Settings" MinHeight="180" Height="190" MinWidth="305" Width="335">
-    <Grid Margin="8">
+        Title="Settings" MinHeight="220" Height="240" MinWidth="315" Width="335">
+    <Grid Margin="8,4,8,8">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
@@ -15,22 +15,42 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <CheckBox Grid.Column="0" Grid.Row="0" x:Name="EnablePreviewAutoUpdate" Margin="0,5,0,0">
-            <TextBlock>
-                Enable
-                <Run FontStyle="Italic">Auto-Update Preview Window</Run>
-                at startup
-            </TextBlock>
+        <Grid Grid.Column="0" Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Separator Grid.Column="0" Margin="2,0,2,0" VerticalAlignment="Center" Background="DarkGray"/>
+            <TextBlock Grid.Column="1" Text="Performance" Foreground="DarkGray"/>
+            <Separator Grid.Column="2" Margin="2,0,2,0" VerticalAlignment="Center" Background="DarkGray"/>
+        </Grid>
+        
+        <CheckBox Grid.Column="0" Grid.Row="1" x:Name="EnablePreviewAutoUpdate" Margin="0,5,0,0">
+            Auto-Update the Preview window
         </CheckBox>
-        <CheckBox Grid.Column="0" Grid.Row="1" x:Name="NotifyMe" Content="Notify me about new Stamper releases" Margin="0,4,0,0"/>
+        <CheckBox Grid.Column="0" Grid.Row="2" x:Name="EnableLiveColorPreview" Margin="0,5,0,0">
+            Enable live-preview of color selections
+        </CheckBox>
+
+        <Grid Grid.Column="0" Grid.Row="3" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Separator Grid.Column="0" Margin="2,0,2,0" VerticalAlignment="Center" Background="DarkGray"/>
+            <TextBlock Grid.Column="1" Text="Startup" Foreground="DarkGray"/>
+            <Separator Grid.Column="2" Margin="2,0,2,0" VerticalAlignment="Center" Background="DarkGray"/>
+        </Grid>
         
-        <Separator Grid.Column="0" Grid.Row="2" Margin="2,8,2,4"/>
-        
-        <Grid Grid.Column="0" Grid.Row="3">
+        <Grid Grid.Column="0" Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -43,18 +63,19 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Column="0" Grid.Row="0" Text="Default token size:" FontWeight="SemiBold" Margin="0,4,0,0"/>
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="Default token size:" Margin="0,4,0,0"/>
             <TextBlock Grid.Column="1" Grid.Row="0" Text="Width:" Margin="12,4,5,0"/>
             <TextBox Grid.Column="2" Grid.Row="0" x:Name="TokenWidth" Margin="0,4,0,0" PreviewTextInput="InputValidation" DataObject.Pasting="InputValidationOnPaste"/>
             <TextBlock Grid.Column="3" Grid.Row="0" Text="Height:" Margin="12,4,5,0"/>
             <TextBox Grid.Column="4" Grid.Row="0" x:Name="TokenHeight" Margin="0,4,0,0" PreviewTextInput="InputValidation" DataObject.Pasting="InputValidationOnPaste"/>
 
-            <TextBlock Grid.Column="0" Grid.Row="2" Text="Default fitmode:" FontWeight="SemiBold" Margin="0,4,0,0"/>
+            <TextBlock Grid.Column="0" Grid.Row="2" Text="Default fitmode:" Margin="0,4,0,0"/>
             <RadioButton Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" GroupName="fitmode" x:Name="FitMode_Stretch" Content="Stretch" Margin="12,4,0,0"/>
             <RadioButton Grid.Column="3" Grid.Row="2" Grid.ColumnSpan="2" GroupName="fitmode" x:Name="FitMode_Fill" Content="Fill" Margin="12,4,0,0"/>
         </Grid>
+        <CheckBox Grid.Column="0" Grid.Row="5" x:Name="NotifyMe" Content="Notify me about new Stamper releases at startup" Margin="0,4,0,0"/>
 
-        <Grid Grid.Column="0" Grid.Row="5">
+        <Grid Grid.Column="0" Grid.Row="7">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>

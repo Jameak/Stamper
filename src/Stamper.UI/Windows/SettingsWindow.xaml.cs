@@ -29,7 +29,8 @@ namespace Stamper.UI.Windows
 
         private void LoadSettings()
         {
-            EnablePreviewAutoUpdate.IsChecked = SettingsManager.StartupAutoUpdatePreview;
+            EnablePreviewAutoUpdate.IsChecked = SettingsManager.AutoUpdatePreview;
+            EnableLiveColorPreview.IsChecked = SettingsManager.LiveColorPreview;
             NotifyMe.IsChecked = !SettingsManager.IgnoreUpdates;
             TokenWidth.Text = SettingsManager.StartupTokenWidth.ToString();
             TokenHeight.Text = SettingsManager.StartupTokenHeight.ToString();
@@ -48,7 +49,8 @@ namespace Stamper.UI.Windows
 
         private void RestoreDefaults_OnClick(object sender, RoutedEventArgs e)
         {
-            SettingsManager.StartupAutoUpdatePreview = false;
+            SettingsManager.AutoUpdatePreview = true;
+            SettingsManager.LiveColorPreview = true;
             SettingsManager.IgnoreUpdates = false;
             SettingsManager.StartupTokenWidth = 512;
             SettingsManager.StartupTokenHeight = 512;
@@ -58,7 +60,8 @@ namespace Stamper.UI.Windows
 
         private void Save_OnClick(object sender, RoutedEventArgs e)
         {
-            SettingsManager.StartupAutoUpdatePreview = EnablePreviewAutoUpdate.IsChecked.Value;
+            SettingsManager.AutoUpdatePreview = EnablePreviewAutoUpdate.IsChecked.Value;
+            SettingsManager.LiveColorPreview = EnableLiveColorPreview.IsChecked.Value;
             SettingsManager.IgnoreUpdates = !NotifyMe.IsChecked.Value;
 
             int width;
