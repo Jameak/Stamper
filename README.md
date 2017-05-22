@@ -17,7 +17,7 @@ Stamper supports loading an image from the local filesystem or directly from a w
 * **Add text to your token.** Stamper lets you place text on top of your token in any position, size, font, rotation, and color.
 
 ### Adding custom layers
-Stamper layers can be added through the UI, or by placing json files in the _layers_ folder. The structure of the json files is as follows:
+Stamper layers can be added automatically through the UI with the option of autogenerating the mask, or by manually placing json files in the _layers_ folder. The structure of the json files is as follows:
 * `name`: The name of the layer. _Required_
 * `file`: A relative path from the _layers_-folder to the image file. This is the image that is shown on top of the input image in Stamper. _Required_
 * `mask`: A relative path from the _layers_-folder to the image to use as a mask. On _border_ layers, this mask is applied to the underlying input image. On _overlay_ layers, this mask is applied to the overlay itself. Pixels with the color #FF00FF00 (#AARRGGBB) will be removed from the underlying image, all other colors are ignored. _Optional_
