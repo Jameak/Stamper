@@ -43,8 +43,7 @@ namespace Stamper.UI.Windows
             _vm.ResetImageCommand = new RelayCommand(o =>
             {
                 TokenControl.ResetControls();
-                SpecialControl._vm.RotationAngle = "0";
-                SpecialControl._vm.TextRotationAngle = "0";
+                SpecialControl.ResetRotation();
                 if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
             });
             _vm.OpenPreviewWindow = new RelayCommand(o => OpenPreviewWindow(null, null), o => _preWindow == null);
@@ -259,11 +258,7 @@ namespace Stamper.UI.Windows
 
         private void SpecialControl_OnRotationChanged(object sender, RoutedEventArgs e)
         {
-            int num;
-            if (int.TryParse((sender as SpecialControl)._vm.RotationAngle, out num))
-            {
-                TokenControl.RotationAngle = num;
-            }
+            TokenControl.RotationAngle = ((RotationChangedEvent) e).RotationAngle;
             if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
         }
 
@@ -272,35 +267,34 @@ namespace Stamper.UI.Windows
             if (e is ColorSelectedEvent)
             {
                 TokenControl.TextColor = new SolidColorBrush(((ColorSelectedEvent)e).Color);
-                return;
             }
-
-            TokenControl.ShowTextBorder = (sender as SpecialControl)._vm.TextManipulationShowBorder;
-            TokenControl.ShowText = (sender as SpecialControl)._vm.TextManipulationShowText ? Visibility.Visible : Visibility.Collapsed;
-            TokenControl.TextFont = (sender as SpecialControl).FontBox.SelectedItem as System.Windows.Media.FontFamily;
-
-            //Convert \n to an actual newline
-            var text = (sender as SpecialControl)._vm.TextContent.ToCharArray();
-            var finalText = new StringBuilder();
-            for (int i = 0; i < text.Length; i++)
+            else if (e is FontChangedEvent)
             {
-                if (text[i] == '\\' && i < text.Length - 1 && text[i + 1] == 'n')
-                {
-                    finalText.Append(Environment.NewLine);
-                    i++;
-                }
-                else
-                {
-                    finalText.Append(text[i]);
-                }
+                TokenControl.TextFont = ((FontChangedEvent) e).Font; 
             }
-            TokenControl.TextContent = finalText.ToString();
-
-
-            int num;
-            if (int.TryParse((sender as SpecialControl)._vm.TextRotationAngle, out num))
+            else if (e is TextManipulationEvent)
             {
-                TokenControl.TextRotationAngle = num;
+                var arg = (TextManipulationEvent) e;
+                TokenControl.ShowTextBorder = arg.ShowTextBorder;
+                TokenControl.ShowText = arg.TextVisible ? Visibility.Visible : Visibility.Collapsed;
+                TokenControl.TextRotationAngle = arg.TextRotationAngle;
+
+                //Convert \n to an actual newline
+                var text = arg.Text.ToCharArray();
+                var finalText = new StringBuilder();
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (text[i] == '\\' && i < text.Length - 1 && text[i + 1] == 'n')
+                    {
+                        finalText.Append(Environment.NewLine);
+                        i++;
+                    }
+                    else
+                    {
+                        finalText.Append(text[i]);
+                    }
+                }
+                TokenControl.TextContent = finalText.ToString();
             }
 
             if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
@@ -309,12 +303,12 @@ namespace Stamper.UI.Windows
         private void SpecialControl_OnButtonZoom(object sender, RoutedEventArgs e)
         {
             var e1 = (ButtonZoomEvent)e;
-            switch (e1.Target)
+            switch (e1.ZoomTarget)
             {
-                case "Image":
+                case ButtonZoomEvent.Target.Image:
                     TokenControl.ZoomControl.ManualZoom(e1);
                     break;
-                case "Text":
+                case ButtonZoomEvent.Target.Text:
                     TokenControl.ZoomControl_Text.ManualZoom(e1);
                     break;
                 default:

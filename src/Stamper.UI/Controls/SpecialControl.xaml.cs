@@ -1,18 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using ColorPickerWPF;
 using ColorPickerWPF.Code;
 using Stamper.DataAccess;
@@ -24,7 +14,7 @@ namespace Stamper.UI.Controls
 {
     public partial class SpecialControl : UserControl
     {
-        public SpecialControlViewModel _vm;
+        private SpecialControlViewModel _vm;
 
         public SpecialControl()
         {
@@ -88,20 +78,44 @@ namespace Stamper.UI.Controls
 
             _vm.PropertyChanged += (sender, args) =>
             {
-                if (args.PropertyName == nameof(_vm.RotationAngle)) RaiseEvent(new RoutedEventArgs(RotationChangedEvent));
+                if (args.PropertyName == nameof(_vm.RotationAngle))
+                {
+                    if (int.TryParse(_vm.RotationAngle, out int rotationAngle))
+                    {
+                        RaiseEvent(new RotationChangedEvent(RotationChangedEvent, rotationAngle));
+                    }
+                }
                 if (args.PropertyName == nameof(_vm.TextManipulationShowBorder) ||
                     args.PropertyName == nameof(_vm.TextManipulationShowText) ||
-                    args.PropertyName == nameof(_vm.TextRotationAngle) || args.PropertyName == nameof(_vm.TextContent))
-                    RaiseEvent(new RoutedEventArgs(TextManipulationChangedEvent));
+                    args.PropertyName == nameof(_vm.TextRotationAngle) ||
+                    args.PropertyName == nameof(_vm.TextContent))
+                {
+                    int.TryParse(_vm.TextRotationAngle, out int textRotationAngle);
+
+                    var textChangedEvent = new TextManipulationEvent(
+                        TextManipulationChangedEvent,
+                        _vm.TextManipulationShowBorder,
+                        _vm.TextManipulationShowText,
+                        _vm.TextContent,
+                        textRotationAngle
+                    );
+                    RaiseEvent(textChangedEvent);
+                }
             };
             _vm.ManualZoomImage = new RelayCommand(o =>
             {
-                RaiseEvent(new ButtonZoomEvent(ButtonZoomEvent, int.Parse(o.ToString()), "Image"));
+                RaiseEvent(new ButtonZoomEvent(ButtonZoomEvent, int.Parse(o.ToString()), Events.ButtonZoomEvent.Target.Image));
             });
             _vm.ManualZoomText = new RelayCommand(o =>
             {
-                RaiseEvent(new ButtonZoomEvent(ButtonZoomEvent, int.Parse(o.ToString()), "Text"));
+                RaiseEvent(new ButtonZoomEvent(ButtonZoomEvent, int.Parse(o.ToString()), Events.ButtonZoomEvent.Target.Text));
             });
+        }
+
+        public void ResetRotation()
+        {
+            _vm.RotationAngle = "0";
+            _vm.TextRotationAngle = "0";
         }
 
         private void FilterBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -111,7 +125,7 @@ namespace Stamper.UI.Controls
 
         private void FontBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            RaiseEvent(new RoutedEventArgs(TextManipulationChangedEvent));
+            RaiseEvent(new FontChangedEvent(TextManipulationChangedEvent, FontBox.SelectedItem as FontFamily));
         }
 
         private void InputValidation(object sender, TextCompositionEventArgs e)

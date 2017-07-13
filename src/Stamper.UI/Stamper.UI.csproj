@@ -86,7 +86,10 @@
     <Compile Include="Converters\Converters.cs" />
     <Compile Include="Events\ButtonZoomEvent.cs" />
     <Compile Include="Events\ColorSelectedEvent.cs" />
+    <Compile Include="Events\FontChangedEvent.cs" />
+    <Compile Include="Events\RotationChangedEvent.cs" />
     <Compile Include="Events\RotationEvent.cs" />
+    <Compile Include="Events\TextManipulationEvent.cs" />
     <Compile Include="Filters\FilterMethods.cs" />
     <Compile Include="Filters\Filters.cs" />
     <Compile Include="BitmapHelper.cs" />

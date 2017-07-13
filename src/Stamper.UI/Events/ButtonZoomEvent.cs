@@ -10,15 +10,20 @@ namespace Stamper.UI.Events
     public class ButtonZoomEvent : RoutedEventArgs
     {
         private readonly int _direction;
-        private readonly string _target;
+        private readonly Target _target;
 
         public int Direction => _direction;
-        public string Target => _target;
+        public Target ZoomTarget => _target;
 
-        public ButtonZoomEvent(RoutedEvent routedEvent, int direction, string target) : base(routedEvent)
+        public ButtonZoomEvent(RoutedEvent routedEvent, int direction, Target target) : base(routedEvent)
         {
             _direction = direction;
             _target = target;
+        }
+
+        public enum Target
+        {
+            Image, Text
         }
     }
 }
