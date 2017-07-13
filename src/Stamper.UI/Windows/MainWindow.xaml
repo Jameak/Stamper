@@ -38,16 +38,16 @@
                 <MenuItem Header="_Keep Preview Window on top" IsCheckable="True" IsChecked="{Binding KeepPreviewOnTop}"/>
             </MenuItem>
             <MenuItem Header="_Size">
-                <MenuItem Header="_256 x 256" Command="{Binding UpdateResolution}" CommandParameter="256"/>
-                <MenuItem Header="_512 x 512" Command="{Binding UpdateResolution}" CommandParameter="512"/>
-                <MenuItem Header="_1024 x 1024" Command="{Binding UpdateResolution}" CommandParameter="1024"/>
+                <MenuItem Header="_256 x 256" Click="MenuItemSize_OnUpdateResolution" CommandParameter="256"/>
+                <MenuItem Header="_512 x 512" Click="MenuItemSize_OnUpdateResolution" CommandParameter="512"/>
+                <MenuItem Header="_1024 x 1024" Click="MenuItemSize_OnUpdateResolution" CommandParameter="1024"/>
                 <MenuItem Header="_Custom Size" Click="MenuItemCustomSize_OnClick"/>
                 <Separator/>
                 <MenuItem Header="_Virtual Tabletop">
-                    <MenuItem Header="_Roll20 (70 x 70)" Command="{Binding UpdateResolution}" CommandParameter="70"/>
-                    <MenuItem Header="_Roll20, 2 by 2 (140 x 140)" Command="{Binding UpdateResolution}" CommandParameter="140"/>
-                    <MenuItem Header="_Fantasy Grounds (50 x 50)" Command="{Binding UpdateResolution}" CommandParameter="50"/>
-                    <MenuItem Header="_Fantasy Grounds (64 x 64)" Command="{Binding UpdateResolution}" CommandParameter="64"/>
+                    <MenuItem Header="_Roll20 (70 x 70)" Click="MenuItemSize_OnUpdateResolution" CommandParameter="70"/>
+                    <MenuItem Header="_Roll20, 2 by 2 (140 x 140)" Click="MenuItemSize_OnUpdateResolution" CommandParameter="140"/>
+                    <MenuItem Header="_Fantasy Grounds (50 x 50)" Click="MenuItemSize_OnUpdateResolution" CommandParameter="50"/>
+                    <MenuItem Header="_Fantasy Grounds (64 x 64)" Click="MenuItemSize_OnUpdateResolution" CommandParameter="64"/>
                 </MenuItem>
                 <MenuItem Header="_Autocrop output" IsCheckable="True" IsChecked="{Binding Autocrop}" ToolTip="Remove empty borders from the output token"/>
             </MenuItem>
@@ -67,43 +67,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*" />
                 </Grid.RowDefinitions>
-                <Rectangle Grid.Column="0" Grid.Row="0">
-                    <Rectangle.Fill>
-                        <ImageBrush TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute" ImageSource="/Stamper.DataAccess;component/Resources/TransparencyTile.bmp"/>
-                    </Rectangle.Fill>
-                </Rectangle>
-                <controls:CustomZoomBorder  x:Name="ZoomControl" Grid.Column="0" Grid.Row="0" AllowDrop="True" Drop="ZoomControl_OnDrop" MouseRightButtonUp="ZoomControl_OnMouseRightButtonUp" MouseWheel="ZoomControl_OnMouseWheel" Rotation="ZoomControl_OnRotation" Background="{Binding BackdropColor}">
-                    <Border>
-                        <Border RenderTransformOrigin="0.5,0.5">
-                            <Border.RenderTransform>
-                                <RotateTransform Angle="{Binding RotationAngle}"/>
-                            </Border.RenderTransform>
-                            <Image Source="{Binding Image}"/>
-                        </Border>
-                    </Border>
+                <controls:TokenControl x:Name="TokenControl" Grid.Column="0" Grid.Row="0" TextRotation="TokenControl_OnTextRotation" Rotation="TokenControl_OnRotation" ImageChanged="TokenControl_OnImageChanged"/>
 
-                </controls:CustomZoomBorder>
-                <StackPanel Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
-                    <Image x:Name="OverlayImage" Stretch="None" Source="{Binding OverlayImage}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
-                    <Image x:Name="BorderImage" Stretch="None" Source="{Binding BorderImage}"/>
-                </StackPanel>
-                <controls:ZoomBorder_NotHitTestable Grid.Column="0" Grid.Row="0" x:Name="ZoomControl_Text" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding ShowText}" Rotation="ZoomControl_Text_OnRotation" MouseRightButtonUp="ZoomControl_OnMouseRightButtonUp" MouseWheel="ZoomControl_OnMouseWheel">
-                    <Border>
-                        <Border BorderThickness="1" BorderBrush="{Binding BorderBrush}" RenderTransformOrigin="0.5,0.5">
-                            <Border.RenderTransform>
-                                <RotateTransform Angle="{Binding TextRotationAngle}"/>
-                            </Border.RenderTransform>
-                            <TextBlock Text="{Binding TextContent}" FontSize="59" FontFamily="{Binding TextFont}" Foreground="{Binding TextColor}"/>
-                        </Border>
-                    </Border>
-                </controls:ZoomBorder_NotHitTestable>
-
-                <StackPanel Grid.Column="0" Grid.Row="0" x:Name="RenderLocation" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" Height="{Binding ImageResolutionHeight}" Width="{Binding ImageResolutionWidth}"/>
-
-
-                <!--Right-hand side controls-->
                 <Rectangle Grid.Column="1" Grid.Row="0" Fill="White"/>
                 <TabControl Grid.Column="1" Grid.Row="0">
                     <TabItem Header="Borders">

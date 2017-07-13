@@ -2,15 +2,13 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
+using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Stamper.DataAccess;
 using Stamper.UI.Controls;
@@ -20,9 +18,6 @@ using Stamper.UI.ViewModels;
 using Stamper.UI.ViewModels.Base;
 using Stamper.UI.ViewModels.Enums;
 using Color = System.Drawing.Color;
-using Point = System.Windows.Point;
-using Rectangle = System.Windows.Shapes.Rectangle;
-using Size = System.Windows.Size;
 
 namespace Stamper.UI.Windows
 {
@@ -38,38 +33,16 @@ namespace Stamper.UI.Windows
         private FilterMethods.BlendFilterDelegate _overlayBlendFilter = FilterMethods.Normal;
         private FilterMethods.BlendFilterDelegate _borderBlendFilter = FilterMethods.Normal;
         private FilterMethods.BlendFilterDelegate _specialFilter = FilterMethods.None;
-        private readonly DispatcherTimer _timer;
 
         public MainWindow()
         {
             InitializeComponent();
             _vm = new MainWindowViewModel();
             DataContext = _vm;
-
-            _vm.UpdateResolution = new RelayCommand(param =>
-            {
-                if (param != null)
-                {
-                    if (param is Tuple<int,int,ImageLoader.FitMode>)
-                    {
-                        var tuple = (Tuple<int, int, ImageLoader.FitMode>) param;
-                        _vm.SetDimensions(tuple.Item3, tuple.Item1, tuple.Item2, _vm.ActualResolutionWidth, _vm.ActualResolutionHeight);
-                    }
-                    else
-                    {
-                        int res;
-                        if (int.TryParse(param.ToString(), out res))
-                        {
-                            _vm.SetDimensions(_vm.FitMode, res, res, _vm.ActualResolutionWidth, _vm.ActualResolutionHeight);
-                        }
-                    }
-                }
-                UpdateOverlays();
-            });
+            
             _vm.ResetImageCommand = new RelayCommand(o =>
             {
-                ZoomControl.Reset();
-                ZoomControl_Text.Reset();
+                TokenControl.ResetControls();
                 SpecialControl._vm.RotationAngle = "0";
                 SpecialControl._vm.TextRotationAngle = "0";
                 if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
@@ -80,30 +53,26 @@ namespace Stamper.UI.Windows
             _vm.LoadToken = new RelayCommand(o => MenuItemLoad_OnClick(null, null));
             _vm.UpdateZoomSpeed = new RelayCommand(o =>
             {
+                TokenControl.SetZoomSpeed(o.ToString());
                 _vm.ZoomSpeed = o.ToString();
-                var param = Convert.ToDecimal(o.ToString(), CultureInfo.InvariantCulture);
-                ZoomControl.ZoomSpeed = Convert.ToDouble(param);
             });
             _vm.PropertyChanged += (sender, args) =>
             {
-                //When a new image is loaded, update the preview
-                if(args.PropertyName == nameof(_vm.Image) && SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
-
-                if(args.PropertyName == nameof(_vm.KeepPreviewOnTop)) if(_preWindow != null) _preWindow.Topmost = _vm.KeepPreviewOnTop;
+                if (args.PropertyName == nameof(_vm.KeepPreviewOnTop) && _preWindow != null)
+                {
+                    _preWindow.Topmost = _vm.KeepPreviewOnTop;
+                }
             };
+            TokenControl.SetImage(DataAccess.Properties.Resources.Splash);
 
-            _vm.Image = BitmapHelper.ConvertBitmapToImageSource(DataAccess.Properties.Resources.Splash);
-
-            //Timer for mousewheel events.
-            _timer = new DispatcherTimer();
-            _timer.Tick += TimerTicked;
-            _timer.Interval = TimeSpan.FromMilliseconds(200);
-            
             //Load settings-values
-            _vm.UpdateResolution.Execute(new Tuple<int, int, ImageLoader.FitMode>(SettingsManager.StartupTokenWidth, SettingsManager.StartupTokenHeight, SettingsManager.StartupFitmode));
+            TokenControl.UpdateResolution.Execute(new Tuple<int, int, ImageLoader.FitMode>(SettingsManager.StartupTokenWidth, SettingsManager.StartupTokenHeight, SettingsManager.StartupFitmode));
+            
 
-
-            CheckIfUpdateAvailable(false);
+            Loaded += async (sender, args) =>
+            {
+                await CheckIfUpdateAvailable(false);
+            };
         }
 
         private async Task<bool> CheckIfUpdateAvailable(bool forceCheck)
@@ -124,7 +93,7 @@ namespace Stamper.UI.Windows
         /// <summary>
         /// Renders the image when all other window rendering has been completed.
         /// </summary>
-        private void RenderUsingDispatcher()
+        internal void RenderUsingDispatcher()
         {
             Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() => RenderImage()));
         }
@@ -137,8 +106,8 @@ namespace Stamper.UI.Windows
             var topmargin = 30;
 
             _preWindow = new PreviewWindow(new PreviewWindowViewModel());
-            _preWindow.Height = Math.Max(164, _vm.ImageResolutionHeight) + topmargin * 2;
-            _preWindow.Width = Math.Max(164, _vm.ImageResolutionWidth) + sidemargin * 2;
+            _preWindow.Height = Math.Max(164, TokenControl.ImageResolutionHeight) + topmargin * 2;
+            _preWindow.Width = Math.Max(164, TokenControl.ImageResolutionWidth) + sidemargin * 2;
             _preWindow.Closed += (o, args) =>
             {
                 _preWindow = null;
@@ -153,42 +122,9 @@ namespace Stamper.UI.Windows
             RenderUsingDispatcher();
         }
 
-        private Bitmap RenderVisual(Visual element)
-        {
-            //Setting image offset and size.
-            var offsetFromTopLeft = new Point(ZoomControl.ActualWidth / 2 - RenderLocation.ActualWidth / 2, ZoomControl.ActualHeight / 2 - RenderLocation.ActualHeight / 2);
-            var imageSize = new Size(_vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
-
-            //Rendering part of visual.
-            var brush = new VisualBrush(element)
-            {
-                ViewboxUnits = BrushMappingMode.Absolute,
-                Viewbox = new Rect(offsetFromTopLeft.X, offsetFromTopLeft.Y, imageSize.Width, imageSize.Height),
-                ViewportUnits = BrushMappingMode.Absolute,
-                Viewport = new Rect(new Point(0, 0), imageSize)
-            };
-
-            var renderTarget = new Rectangle { Width = imageSize.Width, Height = imageSize.Height, Fill = brush };
-            renderTarget.Measure(imageSize);
-            renderTarget.Arrange(new Rect(0, 0, imageSize.Width, imageSize.Height));
-
-            var render = new RenderTargetBitmap((int)imageSize.Width, (int)imageSize.Height, 96, 96, PixelFormats.Pbgra32);
-            render.Render(renderTarget);
-
-
-            using (var ms = new MemoryStream())
-            {
-                var enc = new PngBitmapEncoder();
-                var bitmapFrame = BitmapFrame.Create(render);
-                enc.Frames.Add(bitmapFrame);
-                enc.Save(ms);
-                return BitmapHelper.ConvertToPixelFormat_32bppArgb(new Bitmap(ms));
-            }
-        }
-
         private Bitmap RenderImage()
         {
-            Bitmap bitmap = RenderVisual(ZoomControl);
+            Bitmap bitmap = TokenControl.RenderVisual(TokenControl.ZoomControl);
 
             //Apply the special filter.
             BitmapHelper.AddFilter(bitmap, _vm.SpecialFilterColor, _specialFilter);
@@ -196,23 +132,23 @@ namespace Stamper.UI.Windows
             // Modify the rendered image.
             if (_overlayInfo != null)
             {
-                var overlay = ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
+                var overlay = ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.File, TokenControl.ImageResolutionWidth, TokenControl.ImageResolutionHeight);
                 BitmapHelper.AddFilter(overlay, _overlayTintColor, _overlayBlendFilter);
-                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlay, ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight));
+                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlay, ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.Mask, TokenControl.ImageResolutionWidth, TokenControl.ImageResolutionHeight));
                 BitmapHelper.AddLayerToImage(bitmap, overlay);
             }
 
             if (_borderInfo != null)
             {
-                if (!string.IsNullOrWhiteSpace(_borderInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(bitmap, ImageLoader.LoadBitmapFromFile(_borderInfo.Info.Mask, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight));
-                var border = ImageLoader.LoadBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
+                if (!string.IsNullOrWhiteSpace(_borderInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(bitmap, ImageLoader.LoadBitmapFromFile(_borderInfo.Info.Mask, TokenControl.ImageResolutionWidth, TokenControl.ImageResolutionHeight));
+                var border = ImageLoader.LoadBitmapFromFile(_borderInfo.Info.File, TokenControl.ImageResolutionWidth, TokenControl.ImageResolutionHeight);
                 BitmapHelper.AddFilter(border, _borderTintColor, _borderBlendFilter);
                 BitmapHelper.AddLayerToImage(bitmap, border);  //Draw the border
             }
 
-            if (ZoomControl_Text.Visibility == Visibility.Visible)
+            if (TokenControl.ZoomControl_Text.Visibility == Visibility.Visible)
             {
-                Bitmap text = RenderVisual(ZoomControl_Text);
+                Bitmap text = TokenControl.RenderVisual(TokenControl.ZoomControl_Text);
                 BitmapHelper.AddLayerToImage(bitmap, text);
             }
 
@@ -226,41 +162,41 @@ namespace Stamper.UI.Windows
             return bitmap;
         }
 
-        private void UpdateOverlays()
+        internal void UpdateOverlays()
         {
             //When updating overlays, the actual output resolution may be different from the desired resolution if stretching of overlays isn't allowed.
             if (_borderInfo != null)
             {
                 var border = ImageLoader.LoadBitmapFromFile(_borderInfo.Info.File);
-                _vm.SetDimensions(_vm.FitMode, _vm.DesiredResolutionWidth, _vm.DesiredResolutionHeight, border.Width, border.Height);
+                TokenControl.SetDimensions(border.Width, border.Height);
             }
             else if (_overlayInfo != null)
             {
                 var overlay = ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.File);
-                _vm.SetDimensions(_vm.FitMode, _vm.DesiredResolutionWidth, _vm.DesiredResolutionHeight, overlay.Width, overlay.Height);
+                TokenControl.SetDimensions(overlay.Width, overlay.Height);
             }
 
             if (_borderInfo != null)
             {
                 //Border
-                var borderImage = ImageLoader.LoadBitmapFromFile(_borderInfo.Info.File, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
+                var borderImage = ImageLoader.LoadBitmapFromFile(_borderInfo.Info.File, TokenControl.ImageResolutionWidth, TokenControl.ImageResolutionHeight);
                 BitmapHelper.AddFilter(borderImage, _borderTintColor, _borderBlendFilter);
 
-                _vm.BorderImage = BitmapHelper.ConvertBitmapToImageSource(borderImage);
-                BorderImage.Height = _vm.ImageResolutionHeight;
-                BorderImage.Width = _vm.ImageResolutionWidth;
+                TokenControl.SetBorderImage(borderImage);
+                TokenControl.BorderImage.Height = TokenControl.ImageResolutionHeight;
+                TokenControl.BorderImage.Width = TokenControl.ImageResolutionWidth;
             }
 
             if (_overlayInfo != null)
             {
                 //Overlay
-                var overlayImage = ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.File, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight);
+                var overlayImage = ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.File, TokenControl.ImageResolutionWidth, TokenControl.ImageResolutionHeight);
                 BitmapHelper.AddFilter(overlayImage, _overlayTintColor, _overlayBlendFilter);
-                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlayImage, ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.Mask, _vm.ImageResolutionWidth, _vm.ImageResolutionHeight));
+                if (!string.IsNullOrWhiteSpace(_overlayInfo.Info.Mask)) BitmapHelper.ApplyMaskToImage(overlayImage, ImageLoader.LoadBitmapFromFile(_overlayInfo.Info.Mask, TokenControl.ImageResolutionWidth, TokenControl.ImageResolutionHeight));
 
-                _vm.OverlayImage = BitmapHelper.ConvertBitmapToImageSource(overlayImage);
-                OverlayImage.Height = _vm.ImageResolutionHeight;
-                OverlayImage.Width = _vm.ImageResolutionWidth;
+                TokenControl.SetOverlayImage(overlayImage);
+                TokenControl.OverlayImage.Height = TokenControl.ImageResolutionHeight;
+                TokenControl.OverlayImage.Width = TokenControl.ImageResolutionWidth;
             }
 
             if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
@@ -326,7 +262,7 @@ namespace Stamper.UI.Windows
             int num;
             if (int.TryParse((sender as SpecialControl)._vm.RotationAngle, out num))
             {
-                _vm.RotationAngle = num;
+                TokenControl.RotationAngle = num;
             }
             if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
         }
@@ -335,13 +271,13 @@ namespace Stamper.UI.Windows
         {
             if (e is ColorSelectedEvent)
             {
-                _vm.TextColor = new SolidColorBrush(((ColorSelectedEvent)e).Color);
+                TokenControl.TextColor = new SolidColorBrush(((ColorSelectedEvent)e).Color);
                 return;
             }
 
-            _vm.ShowTextBorder = (sender as SpecialControl)._vm.TextManipulationShowBorder;
-            _vm.ShowText = (sender as SpecialControl)._vm.TextManipulationShowText ? Visibility.Visible : Visibility.Collapsed;
-            _vm.TextFont = (sender as SpecialControl).FontBox.SelectedItem as System.Windows.Media.FontFamily;
+            TokenControl.ShowTextBorder = (sender as SpecialControl)._vm.TextManipulationShowBorder;
+            TokenControl.ShowText = (sender as SpecialControl)._vm.TextManipulationShowText ? Visibility.Visible : Visibility.Collapsed;
+            TokenControl.TextFont = (sender as SpecialControl).FontBox.SelectedItem as System.Windows.Media.FontFamily;
 
             //Convert \n to an actual newline
             var text = (sender as SpecialControl)._vm.TextContent.ToCharArray();
@@ -358,13 +294,13 @@ namespace Stamper.UI.Windows
                     finalText.Append(text[i]);
                 }
             }
-            _vm.TextContent = finalText.ToString();
+            TokenControl.TextContent = finalText.ToString();
 
 
             int num;
             if (int.TryParse((sender as SpecialControl)._vm.TextRotationAngle, out num))
             {
-                _vm.TextRotationAngle = num;
+                TokenControl.TextRotationAngle = num;
             }
 
             if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
@@ -376,10 +312,10 @@ namespace Stamper.UI.Windows
             switch (e1.Target)
             {
                 case "Image":
-                    ZoomControl.ManualZoom(e1);
+                    TokenControl.ZoomControl.ManualZoom(e1);
                     break;
                 case "Text":
-                    ZoomControl_Text.ManualZoom(e1);
+                    TokenControl.ZoomControl_Text.ManualZoom(e1);
                     break;
                 default:
                     throw new ArgumentException();
@@ -390,7 +326,7 @@ namespace Stamper.UI.Windows
 
         private void SpecialControl_OnBackdropColorChanged(object sender, RoutedEventArgs e)
         {
-            _vm.BackdropColor = new SolidColorBrush(((ColorSelectedEvent)e).Color);
+            TokenControl.BackdropColor = new SolidColorBrush(((ColorSelectedEvent)e).Color);
 
             if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
         }
@@ -418,7 +354,7 @@ namespace Stamper.UI.Windows
 
             if (result != null && result.Value)
             {
-                _vm.LoadExternalImage(dialog.FileName, ExternalImageType.LocalFile);
+                TokenControl.LoadExternalImageCommand.Execute(new Tuple<string, ExternalImageType>(dialog.FileName, ExternalImageType.LocalFile));
             }
         }
 
@@ -517,7 +453,7 @@ namespace Stamper.UI.Windows
 
         private void MenuItemCustomSize_OnClick(object sender, RoutedEventArgs e)
         {
-            var win = new CustomSizeWindow(_vm.FitMode)
+            var win = new CustomSizeWindow(TokenControl.FitMode)
             {
                 Owner = this,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner
@@ -534,13 +470,13 @@ namespace Stamper.UI.Windows
                 {
                     if (win.Stretch.IsChecked.HasValue && win.Stretch.IsChecked.Value)
                     {
-                        _vm.UpdateResolution.Execute(new Tuple<int, int, ImageLoader.FitMode>(width, height, ImageLoader.FitMode.Stretch));
+                        TokenControl.UpdateResolution.Execute(new Tuple<int, int, ImageLoader.FitMode>(width, height, ImageLoader.FitMode.Stretch));
                         return;
                     }
 
                     if (win.Fill.IsChecked.HasValue && win.Fill.IsChecked.Value)
                     {
-                        _vm.UpdateResolution.Execute(new Tuple<int, int, ImageLoader.FitMode>(width, height, ImageLoader.FitMode.Fill));
+                        TokenControl.UpdateResolution.Execute(new Tuple<int, int, ImageLoader.FitMode>(width, height, ImageLoader.FitMode.Fill));
                         return;
                     }
                 }
@@ -592,76 +528,34 @@ namespace Stamper.UI.Windows
             window.Show();
             window.Closed += (o, args) => _vm.UpdatePreview.OnCanExecuteChanged(null);
         }
+        
+        private void MenuItemSize_OnUpdateResolution(object sender, RoutedEventArgs e)
+        {
+            var value = int.Parse(((MenuItem)sender).CommandParameter.ToString());
+
+            TokenControl.UpdateResolution.Execute(value);
+        }
         #endregion
 
-        #region ZoomBorder
-        private void ZoomControl_OnDrop(object sender, DragEventArgs e)
+        #region TokenControl event handlers
+        private void TokenControl_OnTextRotation(object sender, RoutedEventArgs e)
         {
-            // Edge or Firefox will save the image locally and pass it as a local file. Chrome gives you a Html-fragment
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                try
-                {
-                    _vm.LoadExternalImage(((string[])e.Data.GetData(DataFormats.FileDrop))[0], ExternalImageType.LocalFile);
-                }
-                catch (NotSupportedException)
-                {
-                    MessageBox.Show(this, "File couldn't be loaded");
-                }
-            }
-            else if (e.Data.GetDataPresent(DataFormats.Html))
-            {
-                var regex = new Regex("<!--StartFragment--><img\\s.*src=\"(?<source>.*?)\".*<!--EndFragment-->");
-                var match = regex.Match(e.Data.GetData(DataFormats.Html).ToString());
-                if (match.Success)
-                {
-                    var imagesource = match.Groups["source"].Value;
-
-                    try
-                    {
-                        _vm.LoadExternalImage(imagesource, ExternalImageType.WebContent);
-                    }
-                    catch (NotSupportedException)
-                    {
-                        MessageBox.Show(this, "Input couldn't be loaded");
-                    }
-                }
-            }
+            var arg = (RotationEvent)e;
+            SpecialControl.SetTextRotationAngle(arg.AngleDelta);
         }
 
-        private void ZoomControl_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        private void TokenControl_OnRotation(object sender, RoutedEventArgs e)
         {
-            if (SettingsManager.AutoUpdatePreview) RenderUsingDispatcher();
+            var arg = (RotationEvent)e;
+            SpecialControl.SetRotationAngle(arg.AngleDelta);
         }
 
-        private void ZoomControl_OnMouseWheel(object sender, MouseWheelEventArgs e)
+        private void TokenControl_OnImageChanged(object sender, RoutedEventArgs e)
         {
             if (SettingsManager.AutoUpdatePreview)
             {
-                _timer.Stop();
-                _timer.Start();
+                RenderUsingDispatcher();
             }
-        }
-
-        private void TimerTicked(object sender, EventArgs eventArgs)
-        {
-            var dt = sender as DispatcherTimer;
-            dt.Stop();
-            RenderUsingDispatcher();
-        }
-
-        private void ZoomControl_Text_OnRotation(object sender, RoutedEventArgs e)
-        {
-            var arg = (RotationEvent)e;
-            _vm.TextRotationAngle += arg.AngleDelta;
-            SpecialControl._vm.TextRotationAngle = _vm.TextRotationAngle.ToString();
-        }
-
-        private void ZoomControl_OnRotation(object sender, RoutedEventArgs e)
-        {
-            var arg = (RotationEvent)e;
-            _vm.RotationAngle += arg.AngleDelta;
-            SpecialControl._vm.RotationAngle = _vm.RotationAngle.ToString();
         }
         #endregion
     }

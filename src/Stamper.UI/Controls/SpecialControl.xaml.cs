@@ -153,6 +153,16 @@ namespace Stamper.UI.Controls
             if (string.IsNullOrWhiteSpace(TextAngle.Text)) _vm.TextRotationAngle = "0";
         }
 
+        public void SetTextRotationAngle(int angleDelta)
+        {
+            _vm.TextRotationAngle = (int.Parse(_vm.TextRotationAngle) + angleDelta).ToString();
+        }
+
+        public void SetRotationAngle(int angleDelta)
+        {
+            _vm.RotationAngle = (int.Parse(_vm.RotationAngle) + angleDelta).ToString();
+        }
+
         #region EventRouting
         public static readonly RoutedEvent FilterSelectedEvent =
             EventManager.RegisterRoutedEvent(nameof(FilterSelectedEvent), RoutingStrategy.Bubble,
@@ -219,5 +229,6 @@ namespace Stamper.UI.Controls
             remove { RemoveHandler(SpecialFilterColorChangedEvent, value); }
         }
         #endregion
+
     }
 }

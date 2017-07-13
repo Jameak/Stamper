@@ -78,6 +78,9 @@
     <Compile Include="Controls\SpecialControl.xaml.cs">
       <DependentUpon>SpecialControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\TokenControl.xaml.cs">
+      <DependentUpon>TokenControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ZoomBorder_NotHitTestable.cs" />
     <Compile Include="Converters\Checkbox_ZoomConverter.cs" />
     <Compile Include="Converters\Converters.cs" />
@@ -100,6 +103,7 @@
     <Compile Include="ViewModels\RatelimitWindowViewModel.cs" />
     <Compile Include="ViewModels\SharedEventHandlingLogic.cs" />
     <Compile Include="ViewModels\SpecialControlViewModel.cs" />
+    <Compile Include="ViewModels\TokenControlViewModel.cs" />
     <Compile Include="Windows\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
@@ -172,6 +176,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\SpecialControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\TokenControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
