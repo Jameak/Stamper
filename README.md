@@ -34,7 +34,7 @@ Stamper layers can be added automatically through the UI with the option of auto
 ```
 
 ## Installation
-Stamper is Windows-only and requires v4.5.2 or newer of the .NET Framework. You can get the latest release of Stamper [here.](https://github.com/Jameak/Stamper/releases)
+Stamper is Windows-only and requires v4.6.2 or newer of the .NET Framework. You can get the latest release of Stamper [here.](https://github.com/Jameak/Stamper/releases)
 
 ## License
 Released under the [MIT license](LICENSE).
