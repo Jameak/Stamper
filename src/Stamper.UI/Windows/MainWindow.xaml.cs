@@ -107,6 +107,13 @@ namespace Stamper.UI.Windows
             _preWindow = new PreviewWindow(new PreviewWindowViewModel());
             _preWindow.Height = Math.Max(164, TokenControl.ImageResolutionHeight) + topmargin * 2;
             _preWindow.Width = Math.Max(164, TokenControl.ImageResolutionWidth) + sidemargin * 2;
+
+            //Undo dpi-scaling that will be applied by Windows to the window size, so that when Windows
+            // applies its dpi-scaling, the resulting window size is the intended number of pizels.
+            var dpiInfo = VisualTreeHelper.GetDpi(this);
+            _preWindow.Width = _preWindow.Width / dpiInfo.DpiScaleX;
+            _preWindow.Height = _preWindow.Height / dpiInfo.DpiScaleY;
+
             _preWindow.Closed += (o, args) =>
             {
                 _preWindow = null;

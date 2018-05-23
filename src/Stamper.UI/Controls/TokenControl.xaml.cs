@@ -104,24 +104,28 @@ namespace Stamper.UI.Controls
 
         public Bitmap RenderVisual(Visual element)
         {
-            //Setting image offset and size.
-            var offsetFromTopLeft = new Point(ZoomControl.ActualWidth / 2 - RenderLocation.ActualWidth / 2, ZoomControl.ActualHeight / 2 - RenderLocation.ActualHeight / 2);
-            var imageSize = new Size(ImageResolutionWidth, ImageResolutionHeight);
+            var dpi = VisualTreeHelper.GetDpi(element);
+            //Reverse the dpi-scaling applied to the size of the RenderLocation control.
+            var unscaledRenderLocation = new Point(RenderLocation.ActualWidth / dpi.DpiScaleX, RenderLocation.ActualHeight / dpi.DpiScaleY);
 
+            //Setting image offset and size.
+            var offsetFromTopLeft = new Point((ZoomControl.ActualWidth / 2 - unscaledRenderLocation.X / 2), (ZoomControl.ActualHeight / 2 - unscaledRenderLocation.Y / 2));
+            var imageSize = new Size(ImageResolutionWidth, ImageResolutionHeight);
+            
             //Rendering part of visual.
             var brush = new VisualBrush(element)
             {
                 ViewboxUnits = BrushMappingMode.Absolute,
                 Viewbox = new Rect(offsetFromTopLeft.X, offsetFromTopLeft.Y, imageSize.Width, imageSize.Height),
-                ViewportUnits = BrushMappingMode.Absolute,
-                Viewport = new Rect(new Point(0, 0), imageSize)
+                ViewportUnits = BrushMappingMode.RelativeToBoundingBox,
+                Viewport = new Rect(new Point(0, 0), new Point(1,1))
             };
 
             var renderTarget = new Rectangle { Width = imageSize.Width, Height = imageSize.Height, Fill = brush };
             renderTarget.Measure(imageSize);
             renderTarget.Arrange(new Rect(0, 0, imageSize.Width, imageSize.Height));
-
-            var render = new RenderTargetBitmap((int)imageSize.Width, (int)imageSize.Height, 96, 96, PixelFormats.Pbgra32);
+            
+            var render = new RenderTargetBitmap(ImageResolutionWidth, ImageResolutionHeight, dpi.PixelsPerInchX, dpi.PixelsPerInchY, PixelFormats.Pbgra32);
             render.Render(renderTarget);
 
 

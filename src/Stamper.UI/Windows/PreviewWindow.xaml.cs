@@ -34,8 +34,12 @@ namespace Stamper.UI.Windows
         {
             var bitmap = BitmapHelper.ConvertBitmapToImageSource(image);
             _vm.BitmapImage = bitmap;
-            _vm.ImageWidth = image.Width;
-            _vm.ImageHeight = image.Height;
+
+            //Undo dpi-scaling that will be applied to the size of the control, so that when Windows
+            // applies its dpi-scaling, the resulting control size is the intended number of pizels.
+            var dpiInfo = VisualTreeHelper.GetDpi(this);
+            _vm.ImageWidth = (int)(image.Width / dpiInfo.DpiScaleX);
+            _vm.ImageHeight = (int)(image.Height / dpiInfo.DpiScaleY);            
         }
     }
 }
