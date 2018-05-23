@@ -1,3 +1,7 @@
+## 1.3.1 - 2018-05-23
+* Fixed auto-updater broken by Github deprecating TLS1.1 api access.
+* Fixed dpi-scaling.
+
 ## 1.3.0 - 2017-05-22
 * Added dedicated Settings window where you can change the default token size and change whether the preview window should update automatically.
 * Added background grid to the token view and to the current color selection to indicate transparency.
